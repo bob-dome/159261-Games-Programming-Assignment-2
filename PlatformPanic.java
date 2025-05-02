@@ -1,6 +1,7 @@
 // 24006168 Jordan Burmeister, 24003491 Wiremu Loader, 24002464 Aimee Gaskin Fryer
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 
 public class PlatformPanic extends GameEngine
 {
@@ -95,9 +96,35 @@ public class PlatformPanic extends GameEngine
         }
     }
 
+    // Load the Single Player Highscore (there is no highscore for multiplayer as it is a versus game while single player is not)
     private int loadHighscore()
     {
         return 0;
+    }
+
+    // Movement and Menu Management
+    public void keyPressed(KeyEvent keyEvent)
+    {
+        // Get Key Pressed
+        int keyCode = keyEvent.getKeyCode();
+
+        // If the game is on the menu the user can press keys to play a certain game
+        if (menu)
+        {
+            // If the player presses 1 it starts the game in single player mode
+            if (keyCode == KeyEvent.VK_1)
+            {
+                menu = false;
+                singlePlayerStarted = true;
+            }
+            
+            // If the player presses 1 it starts the game in mutliplayer mode
+            else if (keyCode == KeyEvent.VK_2)
+            {
+                menu = false;
+                multiplayerStarted = true;
+            }
+        }
     }
 
     public static void main(String[] args)
