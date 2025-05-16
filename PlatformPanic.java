@@ -142,6 +142,8 @@ public class PlatformPanic extends GameEngine
 
         // Debug
         System.out.println("Single Player Started");
+
+        
     }
 
     // Start Multiplayer Gamemode
