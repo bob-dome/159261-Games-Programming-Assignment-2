@@ -53,7 +53,7 @@ public class PlatformPanic extends GameEngine {
     // Used to update game logic such as movement
     @Override
     public void update(double dt) {
-        while (singlePlayerStarted) {
+        if (singlePlayerStarted) {
             platformMovement(dt);
         }
     }
@@ -117,13 +117,11 @@ public class PlatformPanic extends GameEngine {
         if (menu) {
             // If the player presses 1 it starts the game in single player mode
             if (keyCode == KeyEvent.VK_1) {
-                menu = false;
-                singlePlayerStarted = true;
+                startSinglePlayer();
             }
 
             // If the player presses 1 it starts the game in mutliplayer mode
             else if (keyCode == KeyEvent.VK_2) {
-                menu = false;
                 multiplayerStarted = true;
             }
         }
