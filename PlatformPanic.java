@@ -1,16 +1,12 @@
-// 24006168 Jordan Burmeister, 24003491 Wiremu Loader, 24002464 Aimee Gaskin Fryer
+// 24006168 Jordan Burmeister, 24003491 Wiremu Loader, 24002464 Aimee Gaskin Fryer, <ID> Ralph <Last name>
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class PlatformPanic extends GameEngine {
     // Variable Creation
-
-    // Window Size & Grid
-    private static int gameHeight;
-    private static int gameWidth;
-    private static int gridSize;
 
     // Main Menu & Pause
     private static boolean gamePaused;
@@ -26,17 +22,14 @@ public class PlatformPanic extends GameEngine {
     // Multiplayer Variables
     private static boolean multiplayerStarted;
 
-    // Platform
-    Platform platform;
+    // Platforms Array List holds every platform so it can be cleared and reused on
+    // game end
+    ArrayList<Platform> platforms;
 
     // Initialize Variables runs only when the program has been run
     @Override
     public void init() {
-        // Windows Size and Grid Size
-        gameHeight = 750;
-        gameWidth = 500;
-        gridSize = 10;
-        setWindowSize(gameWidth, gameHeight);
+        setWindowSize(750, 500);
 
         // Score & Highscore
         score = 0;
@@ -46,6 +39,11 @@ public class PlatformPanic extends GameEngine {
         // they want
         singlePlayerStarted = false;
         multiplayerStarted = false;
+
+        // Create new Platforms Array List
+        platforms = new ArrayList<>();
+
+        // Audio Loading
 
         // Game Menu & Pause
         gamePaused = false;
@@ -65,20 +63,20 @@ public class PlatformPanic extends GameEngine {
         if (singlePlayerStarted) {
             // Change Background to single player background and clear
             changeBackgroundColor(blue);
-            clearBackground(gameWidth, gameHeight);
+            clearBackground(mWidth, mHeight);
         }
 
         // Create Multiplayer background etc
         else if (multiplayerStarted) {
             // Change Background to multiplayer background and clear
             changeBackgroundColor(Color.cyan);
-            clearBackground(gameWidth, gameHeight);
+            clearBackground(mWidth, mHeight);
         }
 
         else if (menu) {
             // Change Background to single player background and clear
             changeBackgroundColor(Color.black);
-            clearBackground(gameWidth, gameHeight);
+            clearBackground(mWidth, mHeight);
 
             // Change Text Colour
             changeColor(white);
@@ -156,15 +154,30 @@ public class PlatformPanic extends GameEngine {
 
     // Create Platform Objects
     public void createPlatforms() {
-        // ArrayList to store all Platform Objects
-        ArrayList<Platform> platforms;
+        // Create Random to randomize different aspects of the platforms
+        Random random = new Random();
 
         // Variable that defines how many platforms can exist at any given point
         int platformAmount = 10;
 
         // For loop to create each platform
         for (int i = 0; i < platformAmount; i++) {
+            // Variables used for creating the platforms
+            double posX;
+            double posY = 0;
+            double length;
+            double fallSpeed;
+            boolean valid = false;
 
+            // Check that the platforms have valid details
+            while (!valid) {
+                // Randomize the X axis position on where the platform spawns
+                posX = random.nextDouble() * mWidth;
+
+                if (posX > 0 && posX < mWidth) {
+                    valid = true;
+                }
+            }
         }
     }
 
