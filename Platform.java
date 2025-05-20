@@ -3,14 +3,16 @@ public class Platform {
     double posX;
     double posY;
     double length;
+    double width;
     double fallSpeed;
 
     // Constructor
-    public Platform(double posX, double posY, double length, double fallSpeed) {
+    public Platform(double posX, double posY, double length, double width, double fallSpeed) {
         // Set the variables of the platform object to the variables
         this.posX = posX;
         this.posY = posY;
         this.length = length;
+        this.width = width;
         this.fallSpeed = fallSpeed;
     }
 
@@ -27,7 +29,17 @@ public class Platform {
         return length;
     }
 
+    public double getWidth() {
+        return width;
+    }
+
     public double getFallSpeed() {
         return fallSpeed;
+    }
+
+    // Setters used for stuff like updating the position of the platform so that it
+    // is falling
+    public void setPosY(double posY) {
+        this.posY = posY;
     }
 }

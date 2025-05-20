@@ -53,7 +53,9 @@ public class PlatformPanic extends GameEngine {
     // Used to update game logic such as movement
     @Override
     public void update(double dt) {
-
+        while (singlePlayerStarted) {
+            platformMovement(dt);
+        }
     }
 
     // Used to render background and graphics
@@ -64,6 +66,12 @@ public class PlatformPanic extends GameEngine {
             // Change Background to single player background and clear
             changeBackgroundColor(blue);
             clearBackground(mWidth, mHeight);
+
+            // Draw Platforms using a for loop to go through each platform
+            for (Platform platform : platforms) {
+                changeColor(red);
+                drawRectangle(platform.getPosX(), platform.getPosY(), platform.getLength(), platform.getWidth());
+            }
         }
 
         // Create Multiplayer background etc
@@ -166,6 +174,7 @@ public class PlatformPanic extends GameEngine {
             double posX;
             double posY = 0;
             double length;
+            double width = 5;
             double fallSpeed;
             boolean valid = false;
 
@@ -173,11 +182,25 @@ public class PlatformPanic extends GameEngine {
             while (!valid) {
                 // Randomize the X axis position on where the platform spawns
                 posX = random.nextDouble() * mWidth;
+                length = random.nextDouble() * 20;
+                fallSpeed = random.nextDouble() * 10;
 
-                if (posX > 0 && posX < mWidth) {
+                if (posX > 0 && posX < mWidth && length > 5 && length < 30 && fallSpeed > 1 && fallSpeed < 8) {
                     valid = true;
+
+                    // Add the platform to the array list
+                    platforms.add(new Platform(posX, posY, length, width, fallSpeed));
                 }
             }
+        }
+    }
+
+    // Platforms Movement
+    public void platformMovement(double dt) {
+        // For loop to go through each platform and trigger it's movement speed
+        for (Platform platform : platforms) {
+            // Set the pos y to fall
+            platform.setPosY(platform.getPosY() + platform.getFallSpeed() * dt);
         }
     }
 
