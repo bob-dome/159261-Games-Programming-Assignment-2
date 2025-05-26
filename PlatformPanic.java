@@ -1,17 +1,20 @@
-// 24006168 Jordan Burmeister, 24003491 Wiremu Loader, 24002464 Aimee Gaskin Fryer, <ID> Ralph <Last name>
+// 24006168 Jordan Burmeister, 24003491 Wiremu Loader, 24002464 Aimee Gaskin Fryer, <19028995 Ralph Ingley
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class PlatformPanic extends GameEngine {
     // Variable Creation
-
+    int[] Gx,Gy;
+    int units;
+    String direction = "down";
     // Main Menu & Pause
     private static boolean gamePaused;
     private static boolean menu;
-
+    Player player;
+    StartPlatform startPlatform;
     // Score & Highscore
     private static int score;
     private static int highscore;
@@ -30,10 +33,11 @@ public class PlatformPanic extends GameEngine {
     @Override
     public void init() {
         setWindowSize(750, 500);
-
         // Score & Highscore
         score = 0;
         highscore = loadHighscore();
+
+        //player position
 
         // Set Gamemodes to false so that the user can press a button for which game
         // they want
@@ -48,6 +52,10 @@ public class PlatformPanic extends GameEngine {
         // Game Menu & Pause
         gamePaused = false;
         menu = true;
+        
+        //Sprite Load
+        Image Kiwi = loadImage("bird.png");
+
     }
 
     // Used to update game logic such as movement
@@ -55,6 +63,8 @@ public class PlatformPanic extends GameEngine {
     public void update(double dt) {
         if (singlePlayerStarted) {
             platformMovement(dt);
+            playermovement();
+            playergravity(dt);
         }
     }
 
@@ -64,9 +74,13 @@ public class PlatformPanic extends GameEngine {
         // Create Single Player background etc
         if (singlePlayerStarted) {
             // Change Background to single player background and clear
-            changeBackgroundColor(blue);
+            changeBackgroundColor(black);
             clearBackground(mWidth, mHeight);
-
+            changeColor(Color.green);
+            drawRectangle((int) player.getPosX(), (int) player.getPosY(), 30, 30);
+            //Start Platform/s spawn
+            drawRectangle((int) startPlatform.getPosX(), (int) startPlatform.getPosY(), startPlatform.length, startPlatform.width);
+            
             // Draw Platforms using a for loop to go through each platform
             for (Platform platform : platforms) {
                 changeColor(red);
@@ -107,7 +121,6 @@ public class PlatformPanic extends GameEngine {
     private int loadHighscore() {
         return 0;
     }
-
     // Movement and Menu Management
     public void keyPressed(KeyEvent keyEvent) {
         // Get Key Pressed
@@ -125,7 +138,55 @@ public class PlatformPanic extends GameEngine {
                 multiplayerStarted = true;
             }
         }
+        if(singlePlayerStarted || multiplayerStarted)  {
+            if (keyCode == KeyEvent.VK_LEFT ) {
+                System.out.println("Left pressed");
+                direction = "left";
+
+            }
+            if (keyCode == KeyEvent.VK_RIGHT ) {
+                System.out.println("Right pressed");
+                direction = "right";
+
+            }
+            if (keyCode == KeyEvent.VK_UP ) {
+                System.out.println("Up pressed");
+                direction = "up";
+            }
+            if (keyCode == KeyEvent.VK_DOWN ) {
+                System.out.println("Down pressed");
+                direction = "down";
+            }
+        }
     }
+
+    public void keyReleased(KeyEvent event) {
+        if(singlePlayerStarted || multiplayerStarted) {
+            direction = "stop";
+        }
+    }
+
+    public void playermovement() {
+        if (direction.equals("left")) {
+            player.setPosX(player.getPosX() - player.getSpeed());
+        }
+        if (direction.equals("right")) {
+            player.setPosX(player.getPosX() + player.getSpeed());
+        }
+        if (direction.equals("up")) {
+            player.setPosY(player.getPosY() - player.getSpeed());
+            player.jump();
+        }
+        if (direction.equals("down")) {
+            player.setPosY(player.getPosY() + player.getSpeed());
+        }
+
+        if (direction.equals("stop")) {
+            player.setPosY(player.getPosY());
+            player.setPosX(player.getPosX());
+        }
+    }
+
 
     public static void main(String[] args) {
         PlatformPanic platformPanic = new PlatformPanic();
@@ -143,9 +204,10 @@ public class PlatformPanic extends GameEngine {
 
         // Create the Platforms
         createPlatforms();
-
         // Create Player
-
+        createPlayer();
+        // Create Start platform
+        startPlatform();
     }
 
     // Start Multiplayer Gamemode
@@ -162,11 +224,11 @@ public class PlatformPanic extends GameEngine {
     public void createPlatforms() {
         // Create Random to randomize different aspects of the platforms
         Random random = new Random();
-
         // Variable that defines how many platforms can exist at any given point
         int platformAmount = 10;
 
         // For loop to create each platform
+        //R: Why a for loop? Could we while this until gameover condition?
         for (int i = 0; i < platformAmount; i++) {
             // Variables used for creating the platforms
             double posX;
@@ -180,14 +242,15 @@ public class PlatformPanic extends GameEngine {
             while (!valid) {
                 // Randomize the X axis position on where the platform spawns
                 posX = random.nextDouble() * mWidth;
-                length = random.nextDouble() * 20;
-                fallSpeed = random.nextDouble() * 10;
+                length = random.nextDouble() * 40;
+                fallSpeed = random.nextDouble() * 50;
 
                 if (posX > 0 && posX < mWidth && length > 5 && length < 30 && fallSpeed > 1 && fallSpeed < 8) {
                     valid = true;
 
                     // Add the platform to the array list
                     platforms.add(new Platform(posX, posY, length, width, fallSpeed));
+                    //add a variable wait to platform spawns?
                 }
             }
         }
@@ -202,13 +265,37 @@ public class PlatformPanic extends GameEngine {
         }
     }
 
-    // Create Player
+    //Player creation:
     public void createPlayer() {
+        double startX = mWidth / 4;
+        double startY = mHeight / 2 ;
+        int spriteID = 0;
+        int acceleration = 1;
+        double speed = 5.0;
+        double fallSpeed = 10.0;
+        boolean valid = true;
 
+        player = new Player(startX, startY, spriteID, acceleration, speed, fallSpeed, valid);
     }
 
+    // Player Movement
+    public void playergravity(double dt) {
+            player.setPosY(player.getPosY() + player.getFallSpeed() * dt);
+    }
+
+    //Start Platform
+    public void startPlatform(){
+        double posX = mWidth / 2;
+        double posY = mHeight / 2;
+        double length = 50;
+        double width = 10;
+        double fallSpeed = 0.0;
+
+        startPlatform = new StartPlatform(posX,posY,length,width,fallSpeed);
+    }
     // Reset the game
     public void resetGame() {
 
     }
+
 }
