@@ -36,6 +36,13 @@ public class PlatformPanic extends GameEngine {
     int gridColumns;
     int gridWidth;
 
+    //Images
+    Image Logo;
+    Image Background;
+    Image Toucan;
+
+
+
     // Initialize Variables runs only when the program has been run
     @Override
     public void init() 
@@ -68,7 +75,10 @@ public class PlatformPanic extends GameEngine {
         menu = true;
         
         // Sprite Load
-        Image Kiwi = loadImage("bird.png");
+
+        Logo = loadImage("resources/logo.png");
+        Toucan = loadImage("resources/toucan.png");
+        Background = loadImage("resources/background.png");
 
         // Debug
         System.out.println("Platform Panic Initialized");
@@ -90,11 +100,18 @@ public class PlatformPanic extends GameEngine {
     // Used to render background and graphics
     @Override
     public void paintComponent() {
+
         // Create Single Player background etc
         if (singlePlayerStarted) 
         {
+            changeBackgroundColor(Color.BLACK);
+            ///////////////////////////////////////////////////////////////////// AIMEE TO DO
             // Change Background to single player background and clear
-            changeBackgroundColor(black);
+            // drawRectangle(0, 0, mWidth, mHeight);
+            //Coordinates of background image
+            // drawImage(Background, 0,0);
+            /// /////////////////////////////////////////////////////////////////////
+
             clearBackground(mWidth, mHeight);
 
             // Player
@@ -430,5 +447,7 @@ public class PlatformPanic extends GameEngine {
     public void resetGame() {
 
     }
+
+
 
 }
