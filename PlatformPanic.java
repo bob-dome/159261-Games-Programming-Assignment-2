@@ -10,11 +10,13 @@ public class PlatformPanic extends GameEngine {
     int[] Gx,Gy;
     int units;
     String direction = "down";
+
     // Main Menu & Pause
     private static boolean gamePaused;
     private static boolean menu;
     Player player;
     StartPlatform startPlatform;
+
     // Score & Highscore
     private static int score;
     private static int highscore;
@@ -28,11 +30,16 @@ public class PlatformPanic extends GameEngine {
     // Platforms Array List holds every platform so it can be cleared and reused on
     // game end
     ArrayList<Platform> platforms;
+    int platformAmount = 5;
+
+    // Grid Variables
+    final int gridColumns = 10;
+    final int gridWidth = mWidth / gridColumns;
 
     // Initialize Variables runs only when the program has been run
     @Override
     public void init() {
-        setWindowSize(750, 500);
+        setWindowSize(800, 500);
         // Score & Highscore
         score = 0;
         highscore = loadHighscore();
@@ -84,7 +91,7 @@ public class PlatformPanic extends GameEngine {
             // Draw Platforms using a for loop to go through each platform
             for (Platform platform : platforms) {
                 changeColor(red);
-                drawRectangle(platform.getPosX(), platform.getPosY(), platform.getLength(), platform.getWidth());
+                drawSolidRectangle(platform.getPosX(), platform.getPosY(), platform.getLength(), platform.getWidth());
             }
         }
 
@@ -190,7 +197,7 @@ public class PlatformPanic extends GameEngine {
 
     public static void main(String[] args) {
         PlatformPanic platformPanic = new PlatformPanic();
-        GameEngine.createGame(platformPanic, 10);
+        GameEngine.createGame(platformPanic, 60);
     }
 
     // Start Single Player Gamemode
@@ -224,35 +231,41 @@ public class PlatformPanic extends GameEngine {
     public void createPlatforms() {
         // Create Random to randomize different aspects of the platforms
         Random random = new Random();
-        // Variable that defines how many platforms can exist at any given point
-        int platformAmount = 10;
+
+        // Occupied Array checks if a boolean can spawn within the grid
+        boolean[] occupied = new boolean[gridColumns];
 
         // For loop to create each platform
         //R: Why a for loop? Could we while this until gameover condition?
-        for (int i = 0; i < platformAmount; i++) {
+        for (int i = 0; i < platformAmount; i++) 
+        {
             // Variables used for creating the platforms
             double posX;
             double posY = 0;
-            double length;
+            double length = gridWidth - 10;
             double width = 5;
             double fallSpeed;
-            boolean valid = false;
+            int column;
 
-            // Check that the platforms have valid details
-            while (!valid) {
-                // Randomize the X axis position on where the platform spawns
-                posX = random.nextDouble() * mWidth;
-                length = random.nextDouble() * 40;
-                fallSpeed = random.nextDouble() * 50;
+            // Do while loop to make sure platforms spawn in valid columns
+            do 
+            {
+                // Get a random column from the grid
+                column = random.nextInt(gridColumns);
 
-                if (posX > 0 && posX < mWidth && length > 5 && length < 30 && fallSpeed > 1 && fallSpeed < 8) {
-                    valid = true;
+            } while (occupied[column] == true);
+            occupied[column] = true;
 
-                    // Add the platform to the array list
-                    platforms.add(new Platform(posX, posY, length, width, fallSpeed));
-                    //add a variable wait to platform spawns?
-                }
-            }
+            // Set the posistion of the platform to be within the grid
+            posX = column * gridWidth;
+
+            // Random fall speed between 2 and 10
+            fallSpeed = 2 + random.nextDouble() * 8;
+
+
+            // Add the platform to the array list
+            platforms.add(new Platform(posX, posY, length, width, fallSpeed));
+            //add a variable wait to platform spawns?
         }
     }
 
@@ -262,6 +275,70 @@ public class PlatformPanic extends GameEngine {
         for (Platform platform : platforms) {
             // Set the pos y to fall
             platform.setPosY(platform.getPosY() + platform.getFallSpeed() * dt);
+        }
+
+        // Remove the platform when it reaches the bottom of the screen height
+        platforms.removeIf(platform -> platform.getPosY() > mHeight);
+
+        // Create a new random for randomizing speed and column of the platforms | Same as createPlatforms except whilst the code is running
+        Random random = new Random();
+        int added = 0;
+        boolean[] occupied = new boolean[gridColumns];
+
+        // Check if there are platforms that are too close to the top and make it so platforms cannot spawn there
+        for (Platform platform : platforms)
+        {
+            // Get Platform position on the Y axis | This will check whether we should spawn a new platform in this column or not
+            if (platform.getPosY() < mHeight / 2)
+            {
+                // Get Column of the platform by reversing the creation of the platform in the column
+                int column = (int)platform.getPosX() / gridWidth;
+                
+                // The platform is too close to the top so platforms spawned in this column will overlap with the current platform
+                occupied[column] = true;
+            }
+        }
+
+        // While loop to create 5 new platforms 
+        while (added < platformAmount)
+        {
+            // Randomize the column and check that it's not occupuied
+            int column = random.nextInt(gridColumns);
+
+            // If the column is not occupied make a platform to occupy it
+            if (!occupied[column])
+            {
+                occupied[column] = true;
+
+                // Variables used for creating the platforms
+                double posX = column * gridWidth;
+                double posY = 0;
+                double length = gridWidth - 10;
+                double width = 5;
+                double fallSpeed = 2 + random.nextDouble() * 8;
+
+                // Add the platform to the list
+                platforms.add(new Platform(posX, posY, length, width, fallSpeed));
+
+                // Increase added to indicate that a platform has been added
+                added++;
+            }
+
+            // If there are no valid columns left to prevent an infinite loop break out of the while loop
+            boolean invalidSpawn = true;
+            for (boolean occupiedColumn : occupied)
+            {
+                if (!occupiedColumn)
+                {
+                    invalidSpawn = false;
+                }
+            }
+
+            // Break out of the loop
+            if (invalidSpawn)
+            {
+                break;
+            }
         }
     }
 
