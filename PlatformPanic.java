@@ -11,6 +11,7 @@ public class PlatformPanic extends GameEngine {
     int units;
     String direction = "down";
 
+
     // Main Menu & Pause
     private static boolean gamePaused;
     private static boolean menu;
