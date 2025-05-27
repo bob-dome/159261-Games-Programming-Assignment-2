@@ -30,7 +30,7 @@ public class PlatformPanic extends GameEngine {
     // Platforms Array List holds every platform so it can be cleared and reused on
     // game end
     ArrayList<Platform> platforms;
-    int platformAmount = 5;
+    int platformAmount = 10;
 
     // Grid Variables
     int gridColumns;
@@ -83,6 +83,7 @@ public class PlatformPanic extends GameEngine {
             platformMovement(dt);
             playermovement();
             playergravity(dt);
+            playerPlatformCollision();
         }
     }
 
@@ -356,6 +357,44 @@ public class PlatformPanic extends GameEngine {
             {
                 break;
             }
+        }
+    }
+
+    // Player Platform Collision Detection
+    public void playerPlatformCollision()
+    {
+        // Variable that shows if the player is on a platform or not
+        boolean onPlatform = false;
+
+        // Check Play Collision for ALL platforms
+        for (Platform platform : platforms)
+        {
+            // Check if the player is on the platform
+            if (player.getPosX() > platform.getPosX() && player.getPosX() < platform.getPosX() + platform.getLength() &&
+                player.getPosY() + 30 >= platform.getPosY() && player.getPosY() + 30 <= platform.getPosY() + platform.getWidth()) 
+            {
+                // Make sure the player doesn't clip through the platform
+                player.setPosY(platform.getPosY() - 30);
+
+                // Change fall speed to 0 so player doesn't fall through platform
+                player.setFallSpeed(0.0);
+
+                // Set onPlatform to true
+                onPlatform = true;
+                break;
+            }
+
+            // If the player is not on a platform set onPlatform to false
+            else
+            {
+                onPlatform = false;
+            }
+        }
+
+        // If the player is not actively on a platform set their gravity to value
+        if (!onPlatform)
+        {
+            player.setFallSpeed(50.0);
         }
     }
 
