@@ -117,7 +117,7 @@ public class PlatformPanic extends GameEngine {
 
             // Player
             changeColor(Color.green);
-            drawRectangle((int) player.getPosX(), (int) player.getPosY(), 30, 30);
+            drawRectangle((int) player.getPosX(), (int) player.getPosY(), player.getWidth(), player.getHeight());
 
             //Start Platform/s spawn
             drawRectangle((int) startPlatform.getPosX(), (int) startPlatform.getPosY(), startPlatform.length, startPlatform.width);
@@ -384,12 +384,36 @@ public class PlatformPanic extends GameEngine {
         // Variable that shows if the player is on a platform or not
         boolean onPlatform = false;
 
+        // Check if the player is on the starting platform
+        if ((player.getPosX() + player.getWidth()) > startPlatform.getPosX() && 
+        player.getPosX() < (startPlatform.getPosX() + startPlatform.getLength()) &&
+            (player.getPosY() + player.getHeight()) >= startPlatform.getPosY() && 
+            (player.getPosY() + player.getHeight()) <= startPlatform.getPosY() + startPlatform.getWidth())
+        {
+            // Make sure the player doesn't clip through the platform
+            player.setPosY(startPlatform.getPosY() - 30);
+
+            // Change fall speed to 0 so player doesn't fall through platform
+            player.setFallSpeed(0.0);
+
+            // Set onPlatform to true
+            onPlatform = true;
+        }
+
+        // If the player is not on the statting platform set onPlatform to false
+        else
+        {
+            onPlatform = false;
+        }
+
         // Check Play Collision for ALL platforms
         for (Platform platform : platforms)
         {
             // Check if the player is on the platform
-            if (player.getPosX() > platform.getPosX() && player.getPosX() < platform.getPosX() + platform.getLength() &&
-                player.getPosY() + 30 >= platform.getPosY() && player.getPosY() + 30 <= platform.getPosY() + platform.getWidth()) 
+            if ((player.getPosX() + player.getWidth()) > platform.getPosX() && 
+            player.getPosX() < (platform.getPosX() + platform.getLength()) &&
+                (player.getPosY() + player.getHeight()) >= platform.getPosY() && 
+                (player.getPosY() + player.getHeight()) <= platform.getPosY() + platform.getWidth())
             {
                 // Make sure the player doesn't clip through the platform
                 player.setPosY(platform.getPosY() - 30);
@@ -426,7 +450,7 @@ public class PlatformPanic extends GameEngine {
         double fallSpeed = 10.0;
         boolean valid = true;
 
-        player = new Player(startX, startY, spriteID, acceleration, speed, fallSpeed, valid);
+        player = new Player(startX, startY, 30, 30, spriteID, acceleration, speed, fallSpeed, valid);
     }
 
     // Player Movement

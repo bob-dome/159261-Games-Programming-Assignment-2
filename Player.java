@@ -2,6 +2,8 @@ public class Player {
     // Variables for Player
     double posX;
     double posY;
+    int width;
+    int height;
     int spriteID;
     //Gravity/Acceleration factor/jump height between sprite models/individual players?
     //Maybe character select feature?
@@ -11,9 +13,11 @@ public class Player {
     boolean valid = false;
 
     // Constructor
-    public Player(double posX, double posY, int spriteID, int acceleration, double speed, double fallSpeed, boolean valid) {
+    public Player(double posX, double posY, int width, int height, int spriteID, int acceleration, double speed, double fallSpeed, boolean valid) {
         this.posX = posX;
         this.posY = posY;
+        this.width = width;
+        this.height = height;
         this.spriteID = spriteID;
         this.speed = speed;
         this.acceleration = acceleration;
@@ -28,6 +32,16 @@ public class Player {
 
     public double getPosY() {
         return posY;
+    }
+
+    public int getWidth()
+    {
+        return width;
+    }
+
+    public int getHeight()
+    {
+        return height;
     }
 
     public int getSpriteID() {
