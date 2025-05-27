@@ -33,13 +33,16 @@ public class PlatformPanic extends GameEngine {
     int platformAmount = 5;
 
     // Grid Variables
-    final int gridColumns = 10;
-    final int gridWidth = mWidth / gridColumns;
+    int gridColumns;
+    int gridWidth;
 
     // Initialize Variables runs only when the program has been run
     @Override
-    public void init() {
+    public void init() 
+    {
+        // Set Window Size 
         setWindowSize(800, 500);
+
         // Score & Highscore
         score = 0;
         highscore = loadHighscore();
@@ -54,15 +57,23 @@ public class PlatformPanic extends GameEngine {
         // Create new Platforms Array List
         platforms = new ArrayList<>();
 
+        // Set Grid Variables | Amount of columns and width of each column
+        gridColumns = 10;
+        gridWidth = mWidth / gridColumns;
+
         // Audio Loading
 
         // Game Menu & Pause
         gamePaused = false;
         menu = true;
         
-        //Sprite Load
+        // Sprite Load
         Image Kiwi = loadImage("bird.png");
 
+        // Debug
+        System.out.println("Platform Panic Initialized");
+        System.out.println("Grid Columns: " + gridColumns);
+        System.out.println("Grid Width: " + gridWidth);
     }
 
     // Used to update game logic such as movement
@@ -79,12 +90,16 @@ public class PlatformPanic extends GameEngine {
     @Override
     public void paintComponent() {
         // Create Single Player background etc
-        if (singlePlayerStarted) {
+        if (singlePlayerStarted) 
+        {
             // Change Background to single player background and clear
             changeBackgroundColor(black);
             clearBackground(mWidth, mHeight);
+
+            // Player
             changeColor(Color.green);
             drawRectangle((int) player.getPosX(), (int) player.getPosY(), 30, 30);
+
             //Start Platform/s spawn
             drawRectangle((int) startPlatform.getPosX(), (int) startPlatform.getPosY(), startPlatform.length, startPlatform.width);
             
@@ -102,6 +117,7 @@ public class PlatformPanic extends GameEngine {
             clearBackground(mWidth, mHeight);
         }
 
+        // Menu Background
         else if (menu) {
             // Change Background to single player background and clear
             changeBackgroundColor(Color.black);
@@ -128,6 +144,7 @@ public class PlatformPanic extends GameEngine {
     private int loadHighscore() {
         return 0;
     }
+
     // Movement and Menu Management
     public void keyPressed(KeyEvent keyEvent) {
         // Get Key Pressed
@@ -257,7 +274,7 @@ public class PlatformPanic extends GameEngine {
             occupied[column] = true;
 
             // Set the posistion of the platform to be within the grid
-            posX = column * gridWidth;
+            posX = gridWidth * column;
 
             // Random fall speed between 2 and 10
             fallSpeed = 2 + random.nextDouble() * 8;

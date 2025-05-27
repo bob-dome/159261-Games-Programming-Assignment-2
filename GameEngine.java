@@ -139,7 +139,7 @@ public abstract class GameEngine implements KeyListener, MouseListener, MouseMot
     //-------------------------------------------------------
 
     public GameEngine() {
-        this(500, 500);
+        this(800, 500);
     }
 
     // GameEngine Constructor
