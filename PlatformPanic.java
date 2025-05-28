@@ -5,31 +5,34 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class PlatformPanic extends GameEngine {
+public class PlatformPanic extends GameEngine 
+{
     // Variable Creation
+
+    // ??? What are these for
     int[] Gx,Gy;
     int units;
-    String direction = "down";
 
+    // Player Movement
+    String direction = "down";
 
     // Main Menu & Pause
     private static boolean gamePaused;
     private static boolean menu;
     Player player;
-    StartPlatform startPlatform;
-
+    
     // Score & Highscore
     private static int score;
     private static int highscore;
-
+    
     // Single Player Variables
     private static boolean singlePlayerStarted;
-
+    
     // Multiplayer Variables
     private static boolean multiplayerStarted;
-
-    // Platforms Array List holds every platform so it can be cleared and reused on
-    // game end
+    
+    // Platforms Array List holds every platform so it can be cleared and reused on game end | Start Platform is where the player spawns
+    Platform startPlatform;
     ArrayList<Platform> platforms;
     int platformAmount = 10;
 
@@ -41,7 +44,6 @@ public class PlatformPanic extends GameEngine {
     Image Logo;
     Image Background;
     Image Toucan;
-
 
 
     // Initialize Variables runs only when the program has been run
@@ -71,12 +73,12 @@ public class PlatformPanic extends GameEngine {
 
         // Audio Loading
 
+
         // Game Menu & Pause
         gamePaused = false;
         menu = true;
         
         // Sprite Load
-
         Logo = loadImage("resources/logo.png");
         Toucan = loadImage("resources/toucan.png");
         Background = loadImage("resources/background.png");
@@ -89,8 +91,10 @@ public class PlatformPanic extends GameEngine {
 
     // Used to update game logic such as movement
     @Override
-    public void update(double dt) {
-        if (singlePlayerStarted) {
+    public void update(double dt) 
+    {
+        if (singlePlayerStarted) 
+        {
             platformMovement(dt);
             playermovement();
             playergravity(dt);
@@ -100,8 +104,8 @@ public class PlatformPanic extends GameEngine {
 
     // Used to render background and graphics
     @Override
-    public void paintComponent() {
-
+    public void paintComponent() 
+    {
         // Create Single Player background etc
         if (singlePlayerStarted) 
         {
@@ -120,24 +124,27 @@ public class PlatformPanic extends GameEngine {
             drawRectangle((int) player.getPosX(), (int) player.getPosY(), player.getWidth(), player.getHeight());
 
             //Start Platform/s spawn
-            drawRectangle((int) startPlatform.getPosX(), (int) startPlatform.getPosY(), startPlatform.length, startPlatform.width);
+            drawSolidRectangle((int) startPlatform.getPosX(), (int) startPlatform.getPosY(), startPlatform.length, startPlatform.width);
             
             // Draw Platforms using a for loop to go through each platform
-            for (Platform platform : platforms) {
+            for (Platform platform : platforms) 
+            {
                 changeColor(red);
                 drawSolidRectangle(platform.getPosX(), platform.getPosY(), platform.getLength(), platform.getWidth());
             }
         }
 
         // Create Multiplayer background etc
-        else if (multiplayerStarted) {
+        else if (multiplayerStarted) 
+        {
             // Change Background to multiplayer background and clear
             changeBackgroundColor(Color.cyan);
             clearBackground(mWidth, mHeight);
         }
 
         // Menu Background
-        else if (menu) {
+        else if (menu) 
+        {
             // Change Background to single player background and clear
             changeBackgroundColor(Color.black);
             clearBackground(mWidth, mHeight);
@@ -158,30 +165,36 @@ public class PlatformPanic extends GameEngine {
         }
     }
 
-    // Load the Single Player Highscore (there is no highscore for multiplayer as it
-    // is a versus game while single player is not)
-    private int loadHighscore() {
+    // Load the Single Player Highscore
+    private int loadHighscore() 
+    {
         return 0;
     }
 
     // Movement and Menu Management
-    public void keyPressed(KeyEvent keyEvent) {
+    public void keyPressed(KeyEvent keyEvent) 
+    {
         // Get Key Pressed
         int keyCode = keyEvent.getKeyCode();
 
         // If the game is on the menu the user can press keys to play a certain game
-        if (menu) {
+        if (menu) 
+        {
             // If the player presses 1 it starts the game in single player mode
-            if (keyCode == KeyEvent.VK_1) {
+            if (keyCode == KeyEvent.VK_1) 
+            {
                 startSinglePlayer();
             }
 
             // If the player presses 1 it starts the game in mutliplayer mode
-            else if (keyCode == KeyEvent.VK_2) {
+            else if (keyCode == KeyEvent.VK_2) 
+            {
                 multiplayerStarted = true;
             }
         }
-        if(singlePlayerStarted || multiplayerStarted)  {
+
+        if(singlePlayerStarted || multiplayerStarted)  
+        {
             if (keyCode == KeyEvent.VK_LEFT ) {
                 System.out.println("Left pressed");
                 direction = "left";
@@ -209,35 +222,49 @@ public class PlatformPanic extends GameEngine {
         }
     }
 
-    public void playermovement() {
-        if (direction.equals("left")) {
+    public void playermovement() 
+    {
+        if (direction.equals("left")) 
+        {
             player.setPosX(player.getPosX() - player.getSpeed());
         }
-        if (direction.equals("right")) {
+
+        if (direction.equals("right")) 
+        {
             player.setPosX(player.getPosX() + player.getSpeed());
         }
-        if (direction.equals("up")) {
-            player.setPosY(player.getPosY() - player.getSpeed());
-            player.jump();
+
+        if (direction.equals("up")) 
+        {
+            if (player.getPlatformStatus() == true)
+            {
+                player.setPosY(player.getPosY() - player.getSpeed());
+                player.jump();
+            }
         }
-        if (direction.equals("down")) {
+
+        if (direction.equals("down")) 
+        {
             player.setPosY(player.getPosY() + player.getSpeed());
         }
 
-        if (direction.equals("stop")) {
+        if (direction.equals("stop")) 
+        {
             player.setPosY(player.getPosY());
             player.setPosX(player.getPosX());
         }
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) 
+    {
         PlatformPanic platformPanic = new PlatformPanic();
         GameEngine.createGame(platformPanic, 60);
     }
 
     // Start Single Player Gamemode
-    public void startSinglePlayer() {
+    public void startSinglePlayer() 
+    {
         // Set Variables
         menu = false;
         singlePlayerStarted = true;
@@ -247,14 +274,17 @@ public class PlatformPanic extends GameEngine {
 
         // Create the Platforms
         createPlatforms();
+
         // Create Player
         createPlayer();
+
         // Create Start platform
         startPlatform();
     }
 
     // Start Multiplayer Gamemode
-    public void startMultiplayer() {
+    public void startMultiplayer() 
+    {
         // Set Variables for Multiplayer
         menu = false;
         multiplayerStarted = true;
@@ -264,7 +294,8 @@ public class PlatformPanic extends GameEngine {
     }
 
     // Create Platform Objects
-    public void createPlatforms() {
+    public void createPlatforms() 
+    {
         // Create Random to randomize different aspects of the platforms
         Random random = new Random();
 
@@ -306,9 +337,11 @@ public class PlatformPanic extends GameEngine {
     }
 
     // Platforms Movement
-    public void platformMovement(double dt) {
+    public void platformMovement(double dt) 
+    {
         // For loop to go through each platform and trigger it's movement speed
-        for (Platform platform : platforms) {
+        for (Platform platform : platforms) 
+        {
             // Set the pos y to fall
             platform.setPosY(platform.getPosY() + platform.getFallSpeed() * dt);
         }
@@ -382,7 +415,7 @@ public class PlatformPanic extends GameEngine {
     public void playerPlatformCollision()
     {
         // Variable that shows if the player is on a platform or not
-        boolean onPlatform = false;
+        player.onPlatform(false);
 
         // Check if the player is on the starting platform
         if ((player.getPosX() + player.getWidth()) > startPlatform.getPosX() && 
@@ -397,13 +430,13 @@ public class PlatformPanic extends GameEngine {
             player.setFallSpeed(0.0);
 
             // Set onPlatform to true
-            onPlatform = true;
+            player.onPlatform(true);
         }
 
         // If the player is not on the statting platform set onPlatform to false
         else
         {
-            onPlatform = false;
+            player.onPlatform(false);
         }
 
         // Check Play Collision for ALL platforms
@@ -422,28 +455,29 @@ public class PlatformPanic extends GameEngine {
                 player.setFallSpeed(0.0);
 
                 // Set onPlatform to true
-                onPlatform = true;
+                player.onPlatform(true);
                 break;
             }
 
             // If the player is not on a platform set onPlatform to false
             else
             {
-                onPlatform = false;
+                player.onPlatform(false);
             }
         }
 
         // If the player is not actively on a platform set their gravity to value
-        if (!onPlatform)
+        if (!player.getPlatformStatus())
         {
             player.setFallSpeed(50.0);
         }
     }
 
     //Player creation:
-    public void createPlayer() {
-        double startX = mWidth / 4;
-        double startY = mHeight / 2 ;
+    public void createPlayer() 
+    {
+        double startX = mWidth / 2;
+        double startY = mHeight / 2 - 30;
         int spriteID = 0;
         int acceleration = 1;
         double speed = 5.0;
@@ -454,25 +488,26 @@ public class PlatformPanic extends GameEngine {
     }
 
     // Player Movement
-    public void playergravity(double dt) {
+    public void playergravity(double dt) 
+    {
             player.setPosY(player.getPosY() + player.getFallSpeed() * dt);
     }
 
     //Start Platform
-    public void startPlatform(){
+    public void startPlatform()
+    {
         double posX = mWidth / 2;
         double posY = mHeight / 2;
         double length = 50;
         double width = 10;
         double fallSpeed = 0.0;
 
-        startPlatform = new StartPlatform(posX,posY,length,width,fallSpeed);
+        startPlatform = new Platform(posX,posY,length,width,fallSpeed);
     }
+
     // Reset the game
-    public void resetGame() {
+    public void resetGame() 
+    {
 
     }
-
-
-
 }

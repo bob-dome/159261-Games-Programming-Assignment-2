@@ -12,6 +12,9 @@ public class Player {
     double fallSpeed;
     boolean valid = false;
 
+    // Used for checking if the player is on the platform
+    boolean on;
+
     // Constructor
     public Player(double posX, double posY, int width, int height, int spriteID, int acceleration, double speed, double fallSpeed, boolean valid) {
         this.posX = posX;
@@ -64,6 +67,11 @@ public class Player {
         return valid;
     }
 
+    public boolean getPlatformStatus()
+    {
+        return on;
+    }
+
     //Setters
     public void setPosX(double posX) {
         this.posX = posX;
@@ -77,9 +85,15 @@ public class Player {
         this.fallSpeed = fallSpeed;
     }
 
+    public void onPlatform(boolean on)
+    {
+        this.on = on;
+    }
+
     public void jump() {
         for(int i = 10; i > 0; i--) {
             fallSpeed = -200;
+            posY -= 10;
         }
         fallSpeed = 10;
     }
