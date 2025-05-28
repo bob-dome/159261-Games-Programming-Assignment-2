@@ -20,6 +20,7 @@ public class PlatformPanic extends GameEngine
     // Main Menu & Pause
     private static boolean gamePaused;
     private static boolean menu;
+    private static boolean gameOver;
     
     // Score & Highscore
     private static int score;
@@ -46,6 +47,11 @@ public class PlatformPanic extends GameEngine
     Image Logo;
     Image Background;
     Image Toucan;
+    Image ToucanJump;
+    Image ToucanWalk;
+    Image Parrot;
+    Image ParrotJump;
+    Image ParrotWalk;
 
 
     // Initialize Variables runs only when the program has been run
@@ -80,11 +86,19 @@ public class PlatformPanic extends GameEngine
         // Game Menu & Pause
         gamePaused = false;
         menu = true;
+        gameOver = false;
         
         // Sprite Load
         Logo = loadImage("resources/logo.png");
         Toucan = loadImage("resources/toucan.png");
+        ToucanJump = loadImage("resources/toucan_jump.png");
+        ToucanWalk = loadImage("resources/toucan_walk.png");
+        Parrot = loadImage("resources/parrot.png");
+        ParrotJump = loadImage("resources/parrot_jump.png");
+        ParrotWalk = loadImage("resources/parrot_walk.png");
         Background = loadImage("resources/background.png");
+
+
 
         // Debug
         System.out.println("Platform Panic Initialized");
@@ -113,16 +127,10 @@ public class PlatformPanic extends GameEngine
         // Create Single Player background etc
         if (singlePlayerStarted) 
         {
-            changeBackgroundColor(Color.BLACK);
-            
-            ///////////////////////////////////////////////////////////////////// AIMEE TO DO
-            // Change Background to single player background and clear
-            // drawRectangle(0, 0, mWidth, mHeight);
-            //Coordinates of background image
-            // drawImage(Background, 0,0);
-            /// /////////////////////////////////////////////////////////////////////
-
             clearBackground(mWidth, mHeight);
+            //Background
+            drawImage(Background, 0, 0, 800, 500);
+
 
             // Player
             changeColor(Color.green);
@@ -149,15 +157,10 @@ public class PlatformPanic extends GameEngine
         // Create Multiplayer background etc
         else if (multiplayerStarted) 
         {
-            // Change Background to multiplayer background and clear
-            changeBackgroundColor(Color.cyan);
 
-            ///////////////////////////////////////////////////////////////////// AIMEE TO DO
-            // Change Background to single player background and clear
-            // drawRectangle(0, 0, mWidth, mHeight);
-            //Coordinates of background image
-            // drawImage(Background, 0,0);
-            /// /////////////////////////////////////////////////////////////////////
+            clearBackground(mWidth, mHeight);
+            //Background
+            drawImage(Background, 0, 0, 800, 500);
             
             clearBackground(mWidth, mHeight);
         }
@@ -165,31 +168,32 @@ public class PlatformPanic extends GameEngine
         // Menu Background
         else if (menu) 
         {
-            ///////////////////////////////////////////////////////////////////// AIMEE TO DO
-            // 
-            // Please put the logo of the game here and some sort of background if possible
-            // thank you
-            // 
-            /// /////////////////////////////////////////////////////////////////////
 
-
-            // Change Background to single player background and clear
-            changeBackgroundColor(Color.black);
             clearBackground(mWidth, mHeight);
+            //Background
+            drawImage(Background, 0, 0, 800, 500);
+
+            //Logo
+            drawImage(Logo, 175, -50, 472, 328);
 
             // Change Text Colour
-            changeColor(white);
-
-            // Draw Title (can be changed to img logo if added later)
-            drawText(height() / 2 - 250, width() / 2 - 100, "Platform Panic", "Arial", 40);
+            changeColor(Color.BLACK);
 
             // Draw Single Player Label, this can be changed later on to a button or we can
             // check if the user presses on this area
-            drawText(height() / 2 - 250, width() / 2, "     Single Player", "Arial", 30);
+            drawText(200, 300, "     Single Player", "Arial", 50);
 
             // Draw Multiplayer Label, this can be changed later on to a button or we can
             // check if the user presses on this area
-            drawText(height() / 2 - 250, width() / 2 + 50, "       Multiplayer", "Arial", 30);
+            drawText(200, 400, "       Multiplayer", "Arial", 50);
+        }
+        //else if (resetGame()){
+        //}
+
+        if (gameOver){
+            changeBackgroundColor(Color.BLACK);
+            changeColor(Color.RED);
+            drawText(200, 200, "GAME OVER!", "Arial", 50);
         }
     }
 
@@ -562,9 +566,4 @@ public class PlatformPanic extends GameEngine
         startPlatform = new Platform(posX,posY,length,width,fallSpeed);
     }
 
-    // Reset the game
-    public void resetGame() 
-    {
-
-    }
 }
