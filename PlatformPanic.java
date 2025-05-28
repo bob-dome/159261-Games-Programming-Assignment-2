@@ -24,6 +24,7 @@ public class PlatformPanic extends GameEngine
     // Score & Highscore
     private static int score;
     private static int highscore;
+    boolean startScore;
     
     // Single Player Variables
     private static boolean singlePlayerStarted;
@@ -55,6 +56,7 @@ public class PlatformPanic extends GameEngine
         setWindowSize(800, 500);
 
         // Score & Highscore
+        startScore = false;
         score = 0;
         highscore = loadHighscore();
 
@@ -100,6 +102,7 @@ public class PlatformPanic extends GameEngine
             playermovement();
             playergravity(dt);
             playerPlatformCollision();
+            loadScore();
         }
     }
 
@@ -137,6 +140,10 @@ public class PlatformPanic extends GameEngine
                 changeColor(red);
                 drawSolidRectangle(platform.getPosX(), platform.getPosY(), platform.getLength(), platform.getWidth());
             }
+
+            // Display Score
+            changeColor(white);
+            drawText(mWidth / mWidth + 10, mHeight / mHeight + 50, "" + score, "Arial", 40);
         }
 
         // Create Multiplayer background etc
@@ -183,6 +190,16 @@ public class PlatformPanic extends GameEngine
             // Draw Multiplayer Label, this can be changed later on to a button or we can
             // check if the user presses on this area
             drawText(height() / 2 - 250, width() / 2 + 50, "       Multiplayer", "Arial", 30);
+        }
+    }
+
+    // Scoring System when player is no longer using the starting platform start incrementing score
+    private void loadScore()
+    {
+        // Check that the starting platform is gone
+        if (!playerOnStart)
+        {
+            score += 1;
         }
     }
 
