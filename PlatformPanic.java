@@ -9,17 +9,17 @@ public class PlatformPanic extends GameEngine
 {
     // Variable Creation
 
-    // ??? What are these for
+    // ??? What are these for they aren't being referenced anywhere
     int[] Gx,Gy;
     int units;
 
     // Player Movement
+    Player player;
     String direction = "down";
 
     // Main Menu & Pause
     private static boolean gamePaused;
     private static boolean menu;
-    Player player;
     
     // Score & Highscore
     private static int score;
@@ -35,6 +35,7 @@ public class PlatformPanic extends GameEngine
     Platform startPlatform;
     ArrayList<Platform> platforms;
     int platformAmount = 10;
+    boolean playerOnStart = true;
 
     // Grid Variables
     int gridColumns;
@@ -110,6 +111,7 @@ public class PlatformPanic extends GameEngine
         if (singlePlayerStarted) 
         {
             changeBackgroundColor(Color.BLACK);
+            
             ///////////////////////////////////////////////////////////////////// AIMEE TO DO
             // Change Background to single player background and clear
             // drawRectangle(0, 0, mWidth, mHeight);
@@ -124,7 +126,10 @@ public class PlatformPanic extends GameEngine
             drawRectangle((int) player.getPosX(), (int) player.getPosY(), player.getWidth(), player.getHeight());
 
             //Start Platform/s spawn
-            drawSolidRectangle((int) startPlatform.getPosX(), (int) startPlatform.getPosY(), startPlatform.length, startPlatform.width);
+            if (playerOnStart)
+            {
+                drawSolidRectangle((int) startPlatform.getPosX(), (int) startPlatform.getPosY(), startPlatform.length, startPlatform.width);
+            }
             
             // Draw Platforms using a for loop to go through each platform
             for (Platform platform : platforms) 
@@ -139,12 +144,28 @@ public class PlatformPanic extends GameEngine
         {
             // Change Background to multiplayer background and clear
             changeBackgroundColor(Color.cyan);
+
+            ///////////////////////////////////////////////////////////////////// AIMEE TO DO
+            // Change Background to single player background and clear
+            // drawRectangle(0, 0, mWidth, mHeight);
+            //Coordinates of background image
+            // drawImage(Background, 0,0);
+            /// /////////////////////////////////////////////////////////////////////
+            
             clearBackground(mWidth, mHeight);
         }
 
         // Menu Background
         else if (menu) 
         {
+            ///////////////////////////////////////////////////////////////////// AIMEE TO DO
+            // 
+            // Please put the logo of the game here and some sort of background if possible
+            // thank you
+            // 
+            /// /////////////////////////////////////////////////////////////////////
+
+
             // Change Background to single player background and clear
             changeBackgroundColor(Color.black);
             clearBackground(mWidth, mHeight);
@@ -193,32 +214,52 @@ public class PlatformPanic extends GameEngine
             }
         }
 
+        // Player movement for when the game has started
         if(singlePlayerStarted || multiplayerStarted)  
         {
-            if (keyCode == KeyEvent.VK_LEFT ) {
+            if (keyCode == KeyEvent.VK_LEFT ) 
+            {
                 System.out.println("Left pressed");
                 direction = "left";
 
             }
-            if (keyCode == KeyEvent.VK_RIGHT ) {
+
+            if (keyCode == KeyEvent.VK_RIGHT ) 
+            {
                 System.out.println("Right pressed");
                 direction = "right";
 
             }
-            if (keyCode == KeyEvent.VK_UP ) {
+
+            if (keyCode == KeyEvent.VK_UP ) 
+            {
                 System.out.println("Up pressed");
-                direction = "up";
+                
+                // Only allow jumping if the player can jump | is not currently jumping and is on a platform
+                if (player.jumping() && player.getPlatformStatus())
+                {
+                    player.jump();
+                }
             }
-            if (keyCode == KeyEvent.VK_DOWN ) {
+
+            if (keyCode == KeyEvent.VK_DOWN ) 
+            {
                 System.out.println("Down pressed");
                 direction = "down";
             }
         }
     }
 
-    public void keyReleased(KeyEvent event) {
-        if(singlePlayerStarted || multiplayerStarted) {
-            direction = "stop";
+    public void keyReleased(KeyEvent event) 
+    {
+        int keyCode = event.getKeyCode();
+
+        if(singlePlayerStarted || multiplayerStarted) 
+        {
+            if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT)
+            {
+                direction = "stop";
+            }
         }
     }
 
@@ -234,18 +275,10 @@ public class PlatformPanic extends GameEngine
             player.setPosX(player.getPosX() + player.getSpeed());
         }
 
-        if (direction.equals("up")) 
-        {
-            if (player.getPlatformStatus() == true)
-            {
-                player.setPosY(player.getPosY() - player.getSpeed());
-                player.jump();
-            }
-        }
-
         if (direction.equals("down")) 
         {
             player.setPosY(player.getPosY() + player.getSpeed());
+            player.velocityY = 0;
         }
 
         if (direction.equals("stop")) 
@@ -413,58 +446,63 @@ public class PlatformPanic extends GameEngine
 
     // Player Platform Collision Detection
     public void playerPlatformCollision()
-    {
-        // Variable that shows if the player is on a platform or not
-        player.onPlatform(false);
-
+    { 
         // Check if the player is on the starting platform
         if ((player.getPosX() + player.getWidth()) > startPlatform.getPosX() && 
         player.getPosX() < (startPlatform.getPosX() + startPlatform.getLength()) &&
-            (player.getPosY() + player.getHeight()) >= startPlatform.getPosY() && 
-            (player.getPosY() + player.getHeight()) <= startPlatform.getPosY() + startPlatform.getWidth())
+        (player.getPosY() + player.getHeight()) >= startPlatform.getPosY() && 
+        (player.getPosY() + player.getHeight()) <= startPlatform.getPosY() + startPlatform.getWidth() && playerOnStart)
         {
             // Make sure the player doesn't clip through the platform
             player.setPosY(startPlatform.getPosY() - 30);
-
+            
             // Change fall speed to 0 so player doesn't fall through platform
             player.setFallSpeed(0.0);
-
+            
             // Set onPlatform to true
             player.onPlatform(true);
+
+            // Set player's ability to jump to true
+            player.canJump(true);
         }
 
         // If the player is not on the statting platform set onPlatform to false
         else
         {
-            player.onPlatform(false);
-        }
-
-        // Check Play Collision for ALL platforms
-        for (Platform platform : platforms)
-        {
-            // Check if the player is on the platform
-            if ((player.getPosX() + player.getWidth()) > platform.getPosX() && 
-            player.getPosX() < (platform.getPosX() + platform.getLength()) &&
+            // Check Play Collision for ALL platforms
+            for (Platform platform : platforms)
+            {
+                // Check if the player is on the platform
+                if ((player.getPosX() + player.getWidth()) > platform.getPosX() && 
+                player.getPosX() < (platform.getPosX() + platform.getLength()) &&
                 (player.getPosY() + player.getHeight()) >= platform.getPosY() && 
                 (player.getPosY() + player.getHeight()) <= platform.getPosY() + platform.getWidth())
-            {
-                // Make sure the player doesn't clip through the platform
-                player.setPosY(platform.getPosY() - 30);
-
-                // Change fall speed to 0 so player doesn't fall through platform
-                player.setFallSpeed(0.0);
-
-                // Set onPlatform to true
-                player.onPlatform(true);
-                break;
-            }
-
-            // If the player is not on a platform set onPlatform to false
-            else
-            {
-                player.onPlatform(false);
-            }
+                {
+                    // Make sure the player doesn't clip through the platform
+                    player.setPosY(platform.getPosY() - 30);
+                    
+                    // Change fall speed to 0 so player doesn't fall through platform
+                    player.setFallSpeed(0.0);
+                    
+                    // Set onPlatform to true
+                    player.onPlatform(true);
+    
+                    // Set player's ability to jump to true
+                    player.canJump(true);
+    
+                    // Player is no longer on the starting platform as this platform was touched
+                    playerOnStart = false;
+                    break;
+                }
+                
+                // If the player is not on a platform set onPlatform to false
+                else
+                {
+                    player.onPlatform(false);
+                }
+            } 
         }
+        
 
         // If the player is not actively on a platform set their gravity to value
         if (!player.getPlatformStatus())
@@ -477,7 +515,7 @@ public class PlatformPanic extends GameEngine
     public void createPlayer() 
     {
         double startX = mWidth / 2;
-        double startY = mHeight / 2 - 30;
+        double startY = mHeight / 2 - 45;
         int spriteID = 0;
         int acceleration = 1;
         double speed = 5.0;
@@ -490,7 +528,9 @@ public class PlatformPanic extends GameEngine
     // Player Movement
     public void playergravity(double dt) 
     {
-            player.setPosY(player.getPosY() + player.getFallSpeed() * dt);
+        double gravity = 0.1;
+        player.velocityY += gravity;
+        player.setPosY(player.getPosY() + player.velocityY * dt);
     }
 
     //Start Platform
