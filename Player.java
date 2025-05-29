@@ -17,6 +17,9 @@ public class Player {
 
     // Can the player jump
     boolean jump = true;
+    
+    // Can the player double jump
+    boolean doubleJump = true;
 
     // Previous Player Pos Y This will be used to prevent Tunneling
     double prevPosY;
@@ -83,6 +86,12 @@ public class Player {
         return jump;
     }
 
+
+    public boolean doubleJumping()
+    {
+        return doubleJump;
+    }
+    
     public double getPrevPosY()
     {
         return prevPosY;
@@ -117,12 +126,23 @@ public class Player {
 
             // Debug
             System.out.println("Player Jump");
+        } else if (doubleJump && !on && !jump) {
+            doubleJump = false;
+            fallSpeed = -15;
+
+          // Debug
+            System.out.println("Player Double Jump");
         }
     }
-
+   
     public void canJump(boolean jump)
     {
         this.jump = jump;
+    }
+
+    public void canDoubleJump(boolean doubleJump)
+    {
+        this.doubleJump = doubleJump;
     }
 
     public void setPrevPosY(double prevPosY)

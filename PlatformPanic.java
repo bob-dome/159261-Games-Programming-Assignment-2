@@ -298,13 +298,9 @@ public class PlatformPanic extends GameEngine
             if (keyCode == KeyEvent.VK_UP ) 
             {
                 System.out.println("Up pressed");
-                
-                // Only allow jumping if the player can jump | is not currently jumping and is on a platform
-                if (player.jumping() && player.getPlatformStatus())
-                {
-                    player.jump();
-                }
-            }
+
+                // Lets the player jump and double jump
+                player.jump();
 
             if (keyCode == KeyEvent.VK_DOWN ) 
             {
@@ -312,6 +308,7 @@ public class PlatformPanic extends GameEngine
                 direction = "down";
             }
         }
+    }
     }
 
     public void keyReleased(KeyEvent event) 
@@ -522,6 +519,11 @@ public class PlatformPanic extends GameEngine
 
             // Set player's ability to jump to true
             player.canJump(true);
+
+            // Set player's ability to double jump to true
+            player.canDoubleJump(true);
+
+           
         }
 
         // If the player is not on the statting platform set onPlatform to false
@@ -558,6 +560,9 @@ public class PlatformPanic extends GameEngine
                     // Set player's ability to jump to true
                     player.canJump(true);
 
+                    // Set player's ability to double jump to true
+                    player.canDoubleJump(true);
+
                     // Player is no longer on the starting platform as this platform was touched
                     playerOnStart = false;
                     break;
@@ -569,6 +574,7 @@ public class PlatformPanic extends GameEngine
                     player.onPlatform(false);
                 }
             } 
+            
         }
     }
 
@@ -613,7 +619,7 @@ public class PlatformPanic extends GameEngine
 
         startPlatform = new Platform(posX,posY,length,width,fallSpeed);
     }
-
+    
 
 
 }
