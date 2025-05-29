@@ -2,16 +2,17 @@
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Random;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 public class PlatformPanic extends GameEngine 
 {
     // Variable Creation
-
-    // ??? What are these for they aren't being referenced anywhere
-    int[] Gx,Gy;
-    int units;
 
     // Player Movement
     Player player;
@@ -69,6 +70,7 @@ public class PlatformPanic extends GameEngine
         startScore = false;
         score = 0;
         highscore = loadHighscore();
+
 
         //player position
 
@@ -220,10 +222,38 @@ public class PlatformPanic extends GameEngine
         }
     }
 
-    // Load the Single Player Highscore
-    private int loadHighscore() 
-    {
-        return 0;
+    // Call this funtion in the game over function 
+    // Save the Single Player Highscore to a txt file
+    private void saveHighscore() {
+        // Change txt file path to proper path
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("hightscore.txt"))) {
+            writer.write(String.valueOf(highscore));
+        }
+        // Catch any exceptions that may occur when writing to the file
+        catch (Exception e) {
+            System.out.println("Error saving highscore");
+        }
+        
+    }
+    // Load highscore function
+    private int loadHighscore() {
+        // Change txt file path to proper path
+        try (BufferedReader reader = new BufferedReader(new FileReader("highscore.txt"))) {
+            String highScore = reader.readLine();
+
+            // Check if there is a number in the highscore file
+            if (highScore != null) {
+                return Integer.parseInt(highScore);
+            }
+        }
+        // Catch any exceptions that may occur when reading the file
+        catch (Exception e) {
+            // If there is an error loading the highscore, return 0
+            System.out.println("Error loading highscore");
+            return 0;
+
+        }
+        return highscore;
     }
 
     // Movement and Menu Management
@@ -583,5 +613,7 @@ public class PlatformPanic extends GameEngine
 
         startPlatform = new Platform(posX,posY,length,width,fallSpeed);
     }
+
+
 
 }
