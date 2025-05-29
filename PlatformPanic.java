@@ -124,10 +124,11 @@ public class PlatformPanic extends GameEngine
         if (singlePlayerStarted) 
         {
             if (!gamePaused) {
+                playermovement();
+                playerPlatformCollision();
             platformMovement(dt);
-            playermovement();
+            checkbounds();
             playergravity(dt);
-            playerPlatformCollision();
             loadScore();
             gameover();
             }
@@ -340,21 +341,26 @@ public class PlatformPanic extends GameEngine
 
             }
 
-            if (keyCode == KeyEvent.VK_UP ) 
-            {
+            if (keyCode == KeyEvent.VK_UP ) {
                 System.out.println("Up pressed");
-
                 // Lets the player jump and double jump
                 player.jump();
                 drawImage(ToucanJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
 
-            if (keyCode == KeyEvent.VK_DOWN ) 
-            {
+            }
+            if (keyCode == KeyEvent.VK_DOWN ) {
                 System.out.println("Down pressed");
                 direction = "down";
             }
+
         }
-    }
+        if (gameOver){
+            if (keyCode == KeyEvent.VK_ENTER || keyCode == KeyEvent.VK_SPACE) {
+                resetplatforms();
+                startSinglePlayer();
+                gameOver = false;
+            }
+        }
     }
 
     public void keyReleased(KeyEvent event) 
@@ -556,7 +562,6 @@ public class PlatformPanic extends GameEngine
         {
             // Make sure the player doesn't clip through the platform
             player.setPosY(startPlatform.getPosY() - player.getHeight());
-            
             // Change fall speed to 0 so player doesn't fall through platform
             player.setFallSpeed(0.0);
             
@@ -595,7 +600,7 @@ public class PlatformPanic extends GameEngine
                 if (crossedPlatform)
                 {
                     // Make sure the player doesn't clip through the platform
-                    player.setPosY(platform.getPosY() - 30);
+                    player.setPosY(platform.getPosY() - player.getHeight());
                     
                     // Change fall speed to 0 so player doesn't fall through platform
                     player.setFallSpeed(0.0);
@@ -675,7 +680,21 @@ public class PlatformPanic extends GameEngine
         }
 
     }
-
-
+    //CheckBounds (used to keep player onscreen)
+    public void checkbounds(){
+        if (player.getPosX() < 0){
+            player.setPosX(0);
+        }
+        if (player.getPosX() > mWidth){
+            player.setPosX(mWidth);
+        }
+    }
+    //Rest platforms
+    public void resetplatforms(){
+        for(Platform platform : platforms){
+        platform.width = 0;
+        platform.length = 0;
+        }
+    }
 
 }
