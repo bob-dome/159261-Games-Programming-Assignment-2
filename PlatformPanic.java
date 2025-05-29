@@ -1,4 +1,4 @@
-// 24006168 Jordan Burmeister, 24003491 Wiremu Loader, 24002464 Aimee Gaskin Fryer, <19028995 Ralph Ingley
+// 24006168 Jordan Burmeister, 24003491 Wiremu Loader, 24002464 Aimee Gaskin Fryer, 19028995 Ralph Ingley
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -15,7 +15,7 @@ public class PlatformPanic extends GameEngine
 
     // Player Movement
     Player player;
-    String direction = "down";
+    String direction = "stop";
 
     // Main Menu & Pause
     private static boolean gamePaused;
@@ -53,6 +53,10 @@ public class PlatformPanic extends GameEngine
     Image ParrotJump;
     Image ParrotWalk;
 
+    // Audio
+    AudioClip menuMusic;
+    boolean menuMusicPlaying;
+
 
     // Initialize Variables runs only when the program has been run
     @Override
@@ -81,7 +85,8 @@ public class PlatformPanic extends GameEngine
         gridWidth = mWidth / gridColumns;
 
         // Audio Loading
-
+        menuMusic = loadAudio("resources/MenuMusic.wav");
+        menuMusicPlaying = false;
 
         // Game Menu & Pause
         gamePaused = false;
@@ -97,7 +102,6 @@ public class PlatformPanic extends GameEngine
         ParrotJump = loadImage("resources/parrot_jump.png");
         ParrotWalk = loadImage("resources/parrot_walk.png");
         Background = loadImage("resources/background.png");
-
 
 
         // Debug
@@ -127,14 +131,16 @@ public class PlatformPanic extends GameEngine
         // Create Single Player background etc
         if (singlePlayerStarted) 
         {
-            clearBackground(mWidth, mHeight);
             //Background
-            drawImage(Background, 0, 0, 800, 500);
-
+            clearBackground(mWidth, mHeight);
+            drawImage(Background, 0, 0, mWidth, mHeight);
 
             // Player
             changeColor(Color.green);
             drawRectangle((int) player.getPosX(), (int) player.getPosY(), player.getWidth(), player.getHeight());
+
+            // Stop Menu Music
+            stopAudioLoop(menuMusic);
 
             //Start Platform/s spawn
             if (playerOnStart)
@@ -168,6 +174,13 @@ public class PlatformPanic extends GameEngine
         // Menu Background
         else if (menu) 
         {
+            if (!menuMusicPlaying)
+            {
+                // Play Menu Music
+                playAudio(menuMusic);
+                startAudioLoop(menuMusic, 1);
+                menuMusicPlaying = true;
+            }
 
             clearBackground(mWidth, mHeight);
             //Background
@@ -294,12 +307,6 @@ public class PlatformPanic extends GameEngine
         if (direction.equals("right")) 
         {
             player.setPosX(player.getPosX() + player.getSpeed());
-        }
-
-        if (direction.equals("down")) 
-        {
-            player.setPosY(player.getPosY() + player.getSpeed());
-            player.velocityY = 0;
         }
 
         if (direction.equals("stop")) 
@@ -475,7 +482,7 @@ public class PlatformPanic extends GameEngine
         (player.getPosY() + player.getHeight()) <= startPlatform.getPosY() + startPlatform.getWidth() && playerOnStart)
         {
             // Make sure the player doesn't clip through the platform
-            player.setPosY(startPlatform.getPosY() - 30);
+            player.setPosY(startPlatform.getPosY() - player.getHeight());
             
             // Change fall speed to 0 so player doesn't fall through platform
             player.setFallSpeed(0.0);
@@ -493,11 +500,21 @@ public class PlatformPanic extends GameEngine
             // Check Play Collision for ALL platforms
             for (Platform platform : platforms)
             {
-                // Check if the player is on the platform
-                if ((player.getPosX() + player.getWidth()) > platform.getPosX() && 
-                player.getPosX() < (platform.getPosX() + platform.getLength()) &&
-                (player.getPosY() + player.getHeight()) >= platform.getPosY() && 
-                (player.getPosY() + player.getHeight()) <= platform.getPosY() + platform.getWidth())
+                // Variables that show the top of the platform, and the players previous position and current position
+                double platformTop = platform.getPosY();
+                double playerYPrev = player.getPrevPosY() + player.getHeight();
+                double playerYNow = player.getPosY() + player.getHeight();
+
+                // Check if player cross the platform because the fall speed was too large and made them go through
+                boolean crossedPlatform = 
+                    (playerYPrev <= platformTop) &&
+                    (playerYNow >= platformTop) &&
+                    (player.getPosX() + player.getWidth() > platform.getPosX()) &&
+                    (player.getPosX() < platform.getPosX() + platform.getLength()) &&
+                    (player.getFallSpeed() > 0);
+
+                // Check if the player is on the platform / crossed the platform due to too much speed
+                if (crossedPlatform)
                 {
                     // Make sure the player doesn't clip through the platform
                     player.setPosY(platform.getPosY() - 30);
@@ -510,7 +527,7 @@ public class PlatformPanic extends GameEngine
     
                     // Set player's ability to jump to true
                     player.canJump(true);
-    
+
                     // Player is no longer on the starting platform as this platform was touched
                     playerOnStart = false;
                     break;
@@ -522,13 +539,6 @@ public class PlatformPanic extends GameEngine
                     player.onPlatform(false);
                 }
             } 
-        }
-        
-
-        // If the player is not actively on a platform set their gravity to value
-        if (!player.getPlatformStatus())
-        {
-            player.setFallSpeed(50.0);
         }
     }
 
@@ -549,9 +559,17 @@ public class PlatformPanic extends GameEngine
     // Player Movement
     public void playergravity(double dt) 
     {
-        double gravity = 0.1;
-        player.velocityY += gravity;
-        player.setPosY(player.getPosY() + player.velocityY * dt);
+        // Set Gravity
+        double gravity = 1;
+
+        // Get Previous Position
+        player.setPrevPosY(player.getPosY());
+
+        // Set Fallspeed of Player
+        player.setFallSpeed(player.getFallSpeed() + gravity);
+
+        // Set Player's Fall
+        player.setPosY(player.getPosY() + player.getFallSpeed());
     }
 
     //Start Platform

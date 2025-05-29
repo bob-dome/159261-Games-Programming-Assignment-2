@@ -12,14 +12,14 @@ public class Player {
     double fallSpeed;
     boolean valid = false;
 
-    // Player Velocity
-    double velocityY = 0;
-
     // Used for checking if the player is on the platform
     boolean on;
 
     // Can the player jump
-    boolean jump = false;
+    boolean jump = true;
+
+    // Previous Player Pos Y This will be used to prevent Tunneling
+    double prevPosY;
 
     // Constructor
     public Player(double posX, double posY, int width, int height, int spriteID, int acceleration, double speed, double fallSpeed, boolean valid) {
@@ -83,6 +83,11 @@ public class Player {
         return jump;
     }
 
+    public double getPrevPosY()
+    {
+        return prevPosY;
+    }
+
     //Setters
     public void setPosX(double posX) {
         this.posX = posX;
@@ -107,7 +112,7 @@ public class Player {
         {
             // Set jumping to false as character is jumping
             jump = false;
-            velocityY = -20;
+            fallSpeed = -15;
             on = false;
 
             // Debug
@@ -118,5 +123,10 @@ public class Player {
     public void canJump(boolean jump)
     {
         this.jump = jump;
+    }
+
+    public void setPrevPosY(double prevPosY)
+    {
+        this.prevPosY = prevPosY;
     }
 }
