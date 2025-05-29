@@ -255,9 +255,11 @@ public class PlatformPanic extends GameEngine
 
     // Call this funtion in the game over function 
     // Save the Single Player Highscore to a txt file
-    private void saveHighscore() {
+    private void saveHighscore() 
+    {
         // Change txt file path to proper path
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("hightscore.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("hightscore.txt"))) 
+        {
             writer.write(String.valueOf(highscore));
         }
         // Catch any exceptions that may occur when writing to the file
@@ -358,7 +360,7 @@ public class PlatformPanic extends GameEngine
         }
         if (gameOver){
             if (keyCode == KeyEvent.VK_ENTER || keyCode == KeyEvent.VK_SPACE) {
-                resetplatforms();
+                resetGame();
                 startSinglePlayer();
                 gameOver = false;
             }
@@ -685,15 +687,26 @@ public class PlatformPanic extends GameEngine
         startPlatform = new Platform(posX,posY,length,width,fallSpeed);
     }
     //Gameover (Works, needs paint / resets on key?)
-    public void gameover(){
+    public void gameover()
+    {
         //System.out.println(player.posY);
-        if (player.posY >= mHeight){
+        if (player.posY >= mHeight)
+        {
+            // Game Over
             System.out.println("Gameover");
             singlePlayerStarted = false;
             gameOver = true;
-        }
 
+            // Save Highscore if the highscore is greater than the score
+            if (score > highscore)
+            {
+                // Since the score goes up in such fast succession there is a difference of 1 on recorded score
+                highscore = score - 1;
+                saveHighscore();
+            }
+        }
     }
+
     //CheckBounds (used to keep player onscreen)
     public void checkbounds()
     {
@@ -702,16 +715,25 @@ public class PlatformPanic extends GameEngine
             player.setPosX(0);
         }
 
-        else if (player.getPosX() > mWidth)
+        else if (player.getPosX() > mWidth - 5)
         {
-            player.setPosX(mWidth);
+            player.setPosX(mWidth - 5);
         }
     }
+
     //Rest platforms
-    public void resetplatforms(){
-        for(Platform platform : platforms){
-        platform.width = 0;
-        platform.length = 0;
-        }
+    public void resetGame()
+    {
+        // Reset Score to 0
+        score = 0;
+
+        // Clear the platform array
+        platforms.clear();
+
+        // Set gameover to false
+        gameOver = false;
+
+        // Set Player to be on Start
+        playerOnStart = true;
     }
 }
