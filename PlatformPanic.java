@@ -118,11 +118,15 @@ public class PlatformPanic extends GameEngine
     {
         if (singlePlayerStarted) 
         {
+            if (!gamePaused) {
             platformMovement(dt);
             playermovement();
             playergravity(dt);
             playerPlatformCollision();
             loadScore();
+            }
+        } else if (gamePaused) {
+
         }
     }
 
@@ -136,14 +140,14 @@ public class PlatformPanic extends GameEngine
             //Background
             clearBackground(mWidth, mHeight);
             drawImage(Background, 0, 0, mWidth, mHeight);
-
+            
             // Player
             changeColor(Color.green);
             drawRectangle((int) player.getPosX(), (int) player.getPosY(), player.getWidth(), player.getHeight());
-
+            
             // Stop Menu Music
             stopAudioLoop(menuMusic);
-
+            
             //Start Platform/s spawn
             if (playerOnStart)
             {
@@ -156,23 +160,23 @@ public class PlatformPanic extends GameEngine
                 changeColor(red);
                 drawSolidRectangle(platform.getPosX(), platform.getPosY(), platform.getLength(), platform.getWidth());
             }
-
+            
             // Display Score
             changeColor(white);
             drawText(mWidth / mWidth + 10, mHeight / mHeight + 50, "" + score, "Arial", 40);
         }
-
+        
         // Create Multiplayer background etc
         else if (multiplayerStarted) 
         {
-
+            
             clearBackground(mWidth, mHeight);
             //Background
             drawImage(Background, 0, 0, 800, 500);
             
             clearBackground(mWidth, mHeight);
         }
-
+        
         // Menu Background
         else if (menu) 
         {
@@ -183,35 +187,42 @@ public class PlatformPanic extends GameEngine
                 startAudioLoop(menuMusic, 1);
                 menuMusicPlaying = true;
             }
-
+            
             clearBackground(mWidth, mHeight);
             //Background
             drawImage(Background, 0, 0, 800, 500);
-
+            
             //Logo
             drawImage(Logo, 175, -50, 472, 328);
-
+            
             // Change Text Colour
             changeColor(Color.BLACK);
-
+            
             // Draw Single Player Label, this can be changed later on to a button or we can
             // check if the user presses on this area
             drawText(200, 300, "     Single Player", "Arial", 50);
-
+            
             // Draw Multiplayer Label, this can be changed later on to a button or we can
             // check if the user presses on this area
             drawText(200, 400, "       Multiplayer", "Arial", 50);
         }
         //else if (resetGame()){
-        //}
-
-        if (gameOver){
-            changeBackgroundColor(Color.BLACK);
-            changeColor(Color.RED);
-            drawText(200, 200, "GAME OVER!", "Arial", 50);
+            //}
+            
+            if (gameOver){
+                changeBackgroundColor(Color.BLACK);
+                changeColor(Color.RED);
+                drawText(200, 200, "GAME OVER!", "Arial", 50);
+            }
+            
+            if (gamePaused) 
+            {
+            changeColor(Color.BLACK);
+            drawText(mWidth / 2 - 100, mHeight / 2 - 50, "Game Paused", "Arial", 50);
+            drawText(mWidth / 2 - 150, mHeight / 2 + 50, "Press ESC to Resume", "Arial", 30);
         }
     }
-
+    
     // Scoring System when player is no longer using the starting platform start incrementing score
     private void loadScore()
     {
@@ -277,6 +288,23 @@ public class PlatformPanic extends GameEngine
                 multiplayerStarted = true;
             }
         }
+        // When the player presses the escape key it pauses the game
+        if (keyCode == KeyEvent.VK_ESCAPE) 
+        {
+            if (!gamePaused) 
+            {
+                // If the game is not paused then pause it
+                System.out.println("Game Paused");
+                gamePaused = true;
+            } 
+            else 
+            {
+                // If the game is paused then unpause it
+                System.out.println("Game Resumed");
+                gamePaused = false;
+            }
+        }
+        
 
         // Player movement for when the game has started
         if(singlePlayerStarted || multiplayerStarted)  
