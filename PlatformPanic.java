@@ -129,6 +129,7 @@ public class PlatformPanic extends GameEngine
             playergravity(dt);
             playerPlatformCollision();
             loadScore();
+            gameover();
             }
         } else if (gamePaused) {
 
@@ -664,7 +665,17 @@ public class PlatformPanic extends GameEngine
 
         startPlatform = new Platform(posX,posY,length,width,fallSpeed);
     }
-    
+    //Gameover (Works, needs paint / resets on key?)
+    public void gameover(){
+        //System.out.println(player.posY);
+        if (player.posY >= mHeight){
+            System.out.println("Gameover");
+            singlePlayerStarted = false;
+            gameOver = true;
+        }
+
+    }
+
 
 
 }
