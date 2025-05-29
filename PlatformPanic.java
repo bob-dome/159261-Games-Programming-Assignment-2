@@ -48,11 +48,15 @@ public class PlatformPanic extends GameEngine
     Image Logo;
     Image Background;
     Image Toucan;
+    Image ToucanFlipped;
     Image ToucanJump;
     Image ToucanWalk;
+    Image ToucanWalkFlipped;
     Image Parrot;
     Image ParrotJump;
     Image ParrotWalk;
+    Image sprite;
+
 
     // Audio
     AudioClip menuMusic;
@@ -104,7 +108,8 @@ public class PlatformPanic extends GameEngine
         ParrotJump = loadImage("resources/parrot_jump.png");
         ParrotWalk = loadImage("resources/parrot_walk.png");
         Background = loadImage("resources/background.png");
-
+        ToucanFlipped = loadImage("resources/toucan_flipped.png");
+        ToucanWalkFlipped = loadImage("resources/toucan_walk_flipped.png");
 
         // Debug
         System.out.println("Platform Panic Initialized");
@@ -140,14 +145,23 @@ public class PlatformPanic extends GameEngine
             //Background
             clearBackground(mWidth, mHeight);
             drawImage(Background, 0, 0, mWidth, mHeight);
-            
-            // Player
-            changeColor(Color.green);
-            drawRectangle((int) player.getPosX(), (int) player.getPosY(), player.getWidth(), player.getHeight());
+
             
             // Stop Menu Music
             stopAudioLoop(menuMusic);
-            
+            //Walking animations
+            if (!player.jump){
+                drawImage(ToucanJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+            }
+            else if (direction == "left") {
+                drawImage(ToucanWalk, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+            } else if (direction == "right"){
+                drawImage(ToucanWalkFlipped, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+            }
+            else{
+                drawImage(Toucan, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+            }
+
             //Start Platform/s spawn
             if (playerOnStart)
             {
@@ -160,8 +174,10 @@ public class PlatformPanic extends GameEngine
                 changeColor(red);
                 drawSolidRectangle(platform.getPosX(), platform.getPosY(), platform.getLength(), platform.getWidth());
             }
-            
-            // Display Score
+
+
+
+                // Display Score
             changeColor(white);
             drawText(mWidth / mWidth + 10, mHeight / mHeight + 50, "" + score, "Arial", 40);
         }
@@ -329,6 +345,7 @@ public class PlatformPanic extends GameEngine
 
                 // Lets the player jump and double jump
                 player.jump();
+                drawImage(ToucanJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
 
             if (keyCode == KeyEvent.VK_DOWN ) 
             {
@@ -617,7 +634,7 @@ public class PlatformPanic extends GameEngine
         double fallSpeed = 10.0;
         boolean valid = true;
 
-        player = new Player(startX, startY, 30, 30, spriteID, acceleration, speed, fallSpeed, valid);
+        player = new Player(startX, startY, 50, 50, spriteID, acceleration, speed, fallSpeed, valid);
     }
 
     // Player Movement
