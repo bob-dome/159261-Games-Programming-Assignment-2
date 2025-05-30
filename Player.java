@@ -1,4 +1,5 @@
-public class Player {
+public class Player 
+{
     // Variables for Player
     double posX;
     double posY;
@@ -23,6 +24,9 @@ public class Player {
 
     // Previous Player Pos Y This will be used to prevent Tunneling
     double prevPosY;
+
+    // Direction of the player
+    String direction;
 
     // Constructor
     public Player(double posX, double posY, int width, int height, int spriteID, int acceleration, double speed, double fallSpeed, boolean valid) {
@@ -96,6 +100,13 @@ public class Player {
     {
         return prevPosY;
     }
+    
+    // Get Player's Direction
+    public String getDirection()
+    {
+        return direction;
+    }
+
 
     //Setters
     public void setPosX(double posX) {
@@ -114,6 +125,7 @@ public class Player {
     {
         this.on = on;
     }
+
 
     public void jump() 
     {
@@ -148,5 +160,11 @@ public class Player {
     public void setPrevPosY(double prevPosY)
     {
         this.prevPosY = prevPosY;
+    }
+
+    // Set Direction of the player
+    public void setDirection(String direction)
+    {
+        this.direction = direction;
     }
 }

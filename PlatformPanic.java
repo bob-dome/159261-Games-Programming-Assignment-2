@@ -74,9 +74,6 @@ public class PlatformPanic extends GameEngine
         score = 0;
         highscore = loadHighscore();
 
-
-        //player position
-
         // Set Gamemodes to false so that the user can press a button for which game
         // they want
         singlePlayerStarted = false;
@@ -133,11 +130,21 @@ public class PlatformPanic extends GameEngine
                 gameover();
             }
         } 
-        else if (gamePaused) 
-        {
 
+        // Multiplayer
+        if (multiplayerStarted)
+        {
+            if (!gamePaused)
+            {
+                playermovement();
+                playergravity(dt);
+                playerPlatformCollision();
+                platformMovement(dt);
+                checkbounds();
+                loadScore();
+                gameover();
+            }
         }
-        
     }
 
     // Used to render background and graphics
@@ -150,10 +157,6 @@ public class PlatformPanic extends GameEngine
             //Background
             clearBackground(mWidth, mHeight);
             drawImage(Background, 0, 0, mWidth, mHeight);
-
-            
-            // Stop Menu Music
-            stopAudioLoop(menuMusic);
 
             //Walking animations
             if (!player.jump){
@@ -327,39 +330,43 @@ public class PlatformPanic extends GameEngine
             }
         }
         
-
-        // Player movement for when the game has started
-        if(singlePlayerStarted || multiplayerStarted)  
+        // Only allow player movement when the game is not paused
+        if (!gamePaused)
         {
-            if (keyCode == KeyEvent.VK_LEFT ) 
+            // Player movement for when the game has started
+            if(singlePlayerStarted || multiplayerStarted)  
             {
-                System.out.println("Left pressed");
-                direction = "left";
+                if (keyCode == KeyEvent.VK_LEFT ) 
+                {
+                    System.out.println("Left pressed");
+                    direction = "left";
+    
+                }
+    
+                if (keyCode == KeyEvent.VK_RIGHT ) 
+                {
+                    System.out.println("Right pressed");
+                    direction = "right";
+    
+                }
+    
+                if (keyCode == KeyEvent.VK_UP ) 
+                {
+                    System.out.println("Up pressed");
 
+                    // Lets the player jump and double jump
+                    player.jump();
+
+                    drawImage(ToucanJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                }
             }
-
-            if (keyCode == KeyEvent.VK_RIGHT ) 
-            {
-                System.out.println("Right pressed");
-                direction = "right";
-
-            }
-
-            if (keyCode == KeyEvent.VK_UP ) {
-                System.out.println("Up pressed");
-                // Lets the player jump and double jump
-                player.jump();
-                drawImage(ToucanJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
-
-            }
-            if (keyCode == KeyEvent.VK_DOWN ) {
-                System.out.println("Down pressed");
-                direction = "down";
-            }
-
         }
-        if (gameOver){
-            if (keyCode == KeyEvent.VK_ENTER || keyCode == KeyEvent.VK_SPACE) {
+
+        // To reset the game back to single player hit enter or space
+        if (gameOver)
+        {
+            if (keyCode == KeyEvent.VK_ENTER || keyCode == KeyEvent.VK_SPACE) 
+            {
                 resetGame();
                 startSinglePlayer();
                 gameOver = false;
@@ -648,15 +655,25 @@ public class PlatformPanic extends GameEngine
     //Player creation:
     public void createPlayer() 
     {
-        double startX = mWidth / 2;
-        double startY = mHeight / 2 - 60;
-        int spriteID = 0;
-        int acceleration = 1;
-        double speed = 5.0;
-        double fallSpeed = 10.0;
-        boolean valid = true;
+        // Create 1 player in the middle if it's a single player game
+        if (singlePlayerStarted)
+        {
+            double startX = mWidth / 2;
+            double startY = mHeight / 2 - 60;
+            int spriteID = 0;
+            int acceleration = 1;
+            double speed = 5.0;
+            double fallSpeed = 10.0;
+            boolean valid = true;
+    
+            player = new Player(startX, startY, 50, 50, spriteID, acceleration, speed, fallSpeed, valid);
+        }
 
-        player = new Player(startX, startY, 50, 50, spriteID, acceleration, speed, fallSpeed, valid);
+        // Create 2 players one on the left one on the right if it's a multiplayer game
+        if (multiplayerStarted)
+        {
+            
+        }
     }
 
     // Player Movement
