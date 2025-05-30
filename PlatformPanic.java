@@ -218,6 +218,12 @@ public class PlatformPanic extends GameEngine
                 drawSolidRectangle((int) startPlatform2.getPosX(), (int) startPlatform2.getPosY(), startPlatform2.length, startPlatform2.width);
             }
 
+            // Draw Players
+            for (Player player : players)
+            {
+                drawImage(Toucan, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+            }
+
             // Falling platforms
             for (Platform platform : platforms) 
             {
@@ -295,12 +301,12 @@ public class PlatformPanic extends GameEngine
         catch (Exception e) {
             System.out.println("Error saving highscore");
         }
-        
     }
+
     // Load highscore function
     private int loadHighscore() {
         // Change txt file path to proper path
-        try (BufferedReader reader = new BufferedReader(new FileReader("highscore.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("resources/highscore.txt"))) {
             String highScore = reader.readLine();
 
             // Check if there is a number in the highscore file
@@ -385,21 +391,57 @@ public class PlatformPanic extends GameEngine
 
                     drawImage(ToucanJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
                 }
+            }
 
-                // Multiplayer Player Movement
-                if (multiplayerStarted) 
+            // Multiplayer Player Movement
+            if (multiplayerStarted) 
+            {
+                // Jump Movement
+                if (keyCode == KeyEvent.VK_UP) 
                 {
-                    if (keyCode == KeyEvent.VK_W) {
-                        // Player 2 jump
-                        players.get(0).setDirection("up");
-                        System.out.println("Player 2 Jump");
-                    }
-                    if (keyCode == KeyEvent.VK_UP) {
-                        // Player 1 jump
-                        players.get(1).setDirection("up");
-                        System.out.println("Player 1 Jump");
-                    }
-                    
+                    // Player 1 jump
+                    players.get(0).setDirection("up");
+
+                    // Lets the player jump and double jump
+                    players.get(0).jump();
+
+                    drawImage(ToucanJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                }
+
+                if (keyCode == KeyEvent.VK_W) 
+                {
+                    // Player 2 jump
+                    players.get(1).setDirection("up");
+
+                    // Lets the player jump and double jump
+                    players.get(1).jump();
+
+                    drawImage(ToucanJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                }
+                
+                // Left Movement
+                if (keyCode == KeyEvent.VK_LEFT) 
+                {
+                    players.get(0).setDirection("left");
+                }
+
+                if (keyCode == KeyEvent.VK_A) 
+                {
+                    // Player 1 jump
+                    players.get(1).setDirection("left");
+                }
+
+                // Right Movement
+                if (keyCode == KeyEvent.VK_RIGHT) 
+                {
+                    // Player 2 jump
+                    players.get(0).setDirection("right");
+                }
+
+                if (keyCode == KeyEvent.VK_D) 
+                {
+                    // Player 1 jump
+                    players.get(1).setDirection("right");
                 }
             }
         }
@@ -421,11 +463,27 @@ public class PlatformPanic extends GameEngine
     {
         int keyCode = event.getKeyCode();
 
-        if(singlePlayerStarted || multiplayerStarted) 
+        if(singlePlayerStarted) 
         {
             if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT)
             {
                 direction = "stop";
+            }
+        }
+
+        // If the game is in multiplayer and either player has stopped holding a key down
+        if (multiplayerStarted)
+        {
+            if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT)
+            {
+                // Stop player moving
+                players.get(0).setDirection("stop");
+            }
+
+            if (keyCode == KeyEvent.VK_A || keyCode == KeyEvent.VK_D)
+            {
+                // Stop player moving
+                players.get(1).setDirection("stop");
             }
         }
     }
