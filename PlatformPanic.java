@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class PlatformPanic extends GameEngine 
@@ -26,6 +27,9 @@ public class PlatformPanic extends GameEngine
     private int score;
     private int highscore;
     boolean startScore;
+
+    int winP1;
+    int winP2;
     
     // Single Player Variables
     private boolean singlePlayerStarted;
@@ -233,6 +237,13 @@ public class PlatformPanic extends GameEngine
                 changeColor(red);
                 drawSolidRectangle(platform.getPosX(), platform.getPosY(), platform.getLength(), platform.getWidth());
             }
+
+            // Win Count P1
+            changeColor(white);
+            drawText(mWidth / mWidth + 10, mHeight / mHeight + 50, "P1 Wins:" + winP1, "Arial", 20);
+
+            // Win Count P2
+            drawText(mWidth - 110, mHeight / mHeight + 50, "P2 Wins: " + winP2, "Arial", 20);
         }
         
         // Menu Background
@@ -283,10 +294,30 @@ public class PlatformPanic extends GameEngine
     // Scoring System when player is no longer using the starting platform start incrementing score
     private void loadScore()
     {
-        // Check that the starting platform is gone
-        if (!playerOnStart)
+        // Single Player score | Survival Time
+        if (singlePlayerStarted)
         {
-            score += 1;
+            // Check that the starting platform is gone
+            if (!playerOnStart)
+            {
+                score += 1;
+            }
+        }
+
+        // Multiplayer Wins | Whoever survives add 1 to win
+        if (multiplayerStarted)
+        {
+            // If Player 1 falls add 1 to Player 2 wins
+            if (players.get(0).getPosY() > mHeight)
+            {
+                winP2++;
+            }
+
+            // If player 2 falls add 1 to Player 1 Wins
+            if (players.get(1).getPosY() > mHeight)
+            {
+                winP1++;
+            }
         }
     }
 
@@ -627,7 +658,7 @@ public class PlatformPanic extends GameEngine
             // Variables used for creating the platforms
             double posX;
             double posY = 0;
-            double length = gridWidth - 10;
+            double length = gridWidth - 40;
             double width = 5;
             double fallSpeed;
             int column;
@@ -644,8 +675,8 @@ public class PlatformPanic extends GameEngine
             // Set the posistion of the platform to be within the grid
             posX = gridWidth * column;
 
-            // Random fall speed between 2 and 10
-            fallSpeed = 2 + random.nextDouble() * 8;
+            // Random fall speed between 5 and 13
+            fallSpeed = 25 + random.nextDouble() * 15;
 
 
             // Add the platform to the array list
@@ -686,46 +717,39 @@ public class PlatformPanic extends GameEngine
             }
         }
 
-        // While loop to create 5 new platforms 
-        while (added < platformAmount)
-        {
-            // Randomize the column and check that it's not occupuied
-            int column = random.nextInt(gridColumns);
+        // Create an Array List to find all the current free columns
+        ArrayList<Integer> freeColumns = new ArrayList<>();
 
-            // If the column is not occupied make a platform to occupy it
+        // For loop to get all free columns into the ArrayList
+        for (int column = 0; column < gridColumns; column++)
+        {
+            // If the column is not occupied
             if (!occupied[column])
             {
-                occupied[column] = true;
-
-                // Variables used for creating the platforms
-                double posX = column * gridWidth;
-                double posY = 0;
-                double length = gridWidth - 10;
-                double width = 5;
-                double fallSpeed = 2 + random.nextDouble() * 8;
-
-                // Add the platform to the list
-                platforms.add(new Platform(posX, posY, length, width, fallSpeed));
-
-                // Increase added to indicate that a platform has been added
-                added++;
+                // Add the column to the ArrayList
+                freeColumns.add(column);
             }
+        }
 
-            // If there are no valid columns left to prevent an infinite loop break out of the while loop
-            boolean invalidSpawn = true;
-            for (boolean occupiedColumn : occupied)
-            {
-                if (!occupiedColumn)
-                {
-                    invalidSpawn = false;
-                }
-            }
+        // Randomize the free columns and spawn a set amount in this new batch
+        Collections.shuffle(freeColumns);
+        int platformsToSpawn = Math.min(5, freeColumns.size());
 
-            // Break out of the loop
-            if (invalidSpawn)
-            {
-                break;
-            }
+        // For loop to randomly spawn the set amount of platforms
+        for (int i = 0; i < platformsToSpawn; i++)
+        {
+            // Randomize the column and check that it's not occupuied
+            int column = freeColumns.get(i);
+
+            // Variables used for creating the platforms
+            double posX = column * gridWidth;
+            double posY = 0;
+            double length = gridWidth - 40;
+            double width = 5;
+            double fallSpeed = 25 + random.nextDouble() * 15;
+    
+            // Add the platform to the list
+            platforms.add(new Platform(posX, posY, length, width, fallSpeed));
         }
     }
 
