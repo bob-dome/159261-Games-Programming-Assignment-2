@@ -1,7 +1,6 @@
 // 24006168 Jordan Burmeister, 24003491 Wiremu Loader, 24002464 Aimee Gaskin Fryer, 19028995 Ralph Ingley
 
 import java.awt.*;
-import java.awt.RenderingHints.Key;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -39,6 +38,12 @@ public class PlatformPanic extends GameEngine
     ArrayList<Platform> platforms;
     int platformAmount = 10;
     boolean playerOnStart = true;
+
+    // Multiplayer Platforms
+    Platform startPlatform1;
+    Platform startPlatform2;
+    boolean player1OnStart = true;
+    boolean player2OnStart = true;
 
     // Multiplayer players list
     ArrayList<Player> players;
@@ -198,22 +203,27 @@ public class PlatformPanic extends GameEngine
         else if (multiplayerStarted) 
         {
             
-           clearBackground(mWidth, mHeight);
+            clearBackground(mWidth, mHeight);
             drawImage(Background, 0, 0, mWidth, mHeight);
 
-            if (playerOnStart && players != null && players.size() >= 2) 
+            //Start Platform for Player 1 spawn
+            if (player1OnStart)
             {
-                // Draw Start Platforms for both players
-                drawSolidRectangle((int) startPlatform.getPosX(), (int) startPlatform.getPosY(), startPlatform.getLength(), startPlatform.getWidth());
-                drawSolidRectangle((int) (startPlatform.getPosX() + mWidth / 2), (int) startPlatform.getPosY(), startPlatform.getLength(), startPlatform.getWidth());
+                drawSolidRectangle((int) startPlatform1.getPosX(), (int) startPlatform1.getPosY(), startPlatform1.length, startPlatform1.width);
             }
 
+            //Start Platform for Player 2 spawn
+            if (player2OnStart)
+            {
+                drawSolidRectangle((int) startPlatform2.getPosX(), (int) startPlatform2.getPosY(), startPlatform2.length, startPlatform2.width);
+            }
+
+            // Falling platforms
             for (Platform platform : platforms) 
             {
                 changeColor(red);
                 drawSolidRectangle(platform.getPosX(), platform.getPosY(), platform.getLength(), platform.getWidth());
             }
-
         }
         
         // Menu Background
@@ -326,7 +336,7 @@ public class PlatformPanic extends GameEngine
             // If the player presses 1 it starts the game in mutliplayer mode
             else if (keyCode == KeyEvent.VK_2) 
             {
-                multiplayerStarted = true;
+                startMultiplayer();
             }
         }
         // When the player presses the escape key it pauses the game
@@ -530,10 +540,6 @@ public class PlatformPanic extends GameEngine
 
         // Create Start platform
         startPlatform();
-
-
-
-
     }
 
     // Create Platform Objects
@@ -659,182 +665,204 @@ public class PlatformPanic extends GameEngine
     { 
         if (singlePlayerStarted) 
         {
-        // Check if the player is on the starting platform
-        if (playerOnStart)
-        {
-            // Variables that show the top of the starting platform, and the players previous position and current position
-            double platformTop = startPlatform.getPosY();
-            double playerYPrev = player.getPrevPosY() + player.getHeight();
-            double playerYNow = player.getPosY() + player.getHeight();
-
-            // Check if player crosses the starting platform because the fall speed was too large and made them go through
-            boolean crossedPlatform = 
-                (playerYPrev <= platformTop) &&
-                (playerYNow >= platformTop) &&
-                (player.getPosX() + player.getWidth() > startPlatform.getPosX()) &&
-                (player.getPosX() < startPlatform.getPosX() + startPlatform.getLength()) &&
-                (player.getFallSpeed() > 0);
-
-            // If the player crossed the starting platform then make sure they land on it
-            if (crossedPlatform)
+            // Check if the player is on the starting platform
+            if (playerOnStart)
             {
-                // Make sure the player doesn't clip through the platform
-                player.setPosY(startPlatform.getPosY() - player.getHeight());
-    
-                // Change fall speed to 0 so player doesn't fall through platform
-                player.setFallSpeed(0.0);
-                
-                // Set onPlatform to true
-                player.onPlatform(true);
-    
-                // Set player's ability to jump to true
-                player.canJump(true);
-    
-                // Set player's ability to double jump to true
-                player.canDoubleJump(true);
+                // Variables that show the top of the starting platform, and the players previous position and current position
+                double platformTop = startPlatform.getPosY();
+                double playerYPrev = player.getPrevPosY() + player.getHeight();
+                double playerYNow = player.getPosY() + player.getHeight();
 
-                // Return since the player is still on the starting platform
-                return;
-            }
-            
-        }
+                // Check if player crosses the starting platform because the fall speed was too large and made them go through
+                boolean crossedPlatform = 
+                    (playerYPrev <= platformTop) &&
+                    (playerYNow >= platformTop) &&
+                    (player.getPosX() + player.getWidth() > startPlatform.getPosX()) &&
+                    (player.getPosX() < startPlatform.getPosX() + startPlatform.getLength()) &&
+                    (player.getFallSpeed() > 0);
 
-        // If the player is not on the statting platform set onPlatform to false
-        // Check Play Collision for ALL platforms
-        for (Platform platform : platforms)
-        {
-            // Variables that show the top of the platform, and the players previous position and current position
-            double platformTop = platform.getPosY();
-            double playerYPrev = player.getPrevPosY() + player.getHeight();
-            double playerYNow = player.getPosY() + player.getHeight();
-
-            // Check if player cross the platform because the fall speed was too large and made them go through
-            boolean crossedPlatform = 
-                (playerYPrev <= platformTop) &&
-                (playerYNow >= platformTop) &&
-                (player.getPosX() + player.getWidth() > platform.getPosX()) &&
-                (player.getPosX() < platform.getPosX() + platform.getLength()) &&
-                (player.getFallSpeed() > 0);
-
-            // Check if the player is on the platform / crossed the platform due to too much speed
-            if (crossedPlatform)
-            {
-                // Make sure the player doesn't clip through the platform
-                player.setPosY(platform.getPosY() - player.getHeight());
-                    
-                // Change fall speed to 0 so player doesn't fall through platform
-                player.setFallSpeed(0.0);
-                    
-                // Set onPlatform to true
-                player.onPlatform(true);
-    
-                // Set player's ability to jump to true
-                player.canJump(true);
-
-                // Set player's ability to double jump to true
-                player.canDoubleJump(true);
-
-                // Player is no longer on the starting platform as this platform was touched
-                playerOnStart = false;
-                break;
-            }
-                
-            // If the player is not on a platform set onPlatform to false
-            else
-            {
-                player.onPlatform(false);
-            }        
-        }
-    }
-        // Not sure if this is the best way to do this
-        if (multiplayerStarted) {
-            // Ensure players list is initialized and has players
-            if (players != null && !players.isEmpty()) {
-                // Check if the players are on the starting platform
-                for (Player player : players) 
+                // If the player crossed the starting platform then make sure they land on it
+                if (crossedPlatform)
                 {
-                    if (playerOnStart) 
+                    // Make sure the player doesn't clip through the platform
+                    player.setPosY(startPlatform.getPosY() - player.getHeight());
+        
+                    // Change fall speed to 0 so player doesn't fall through platform
+                    player.setFallSpeed(0.0);
+                    
+                    // Set onPlatform to true
+                    player.onPlatform(true);
+        
+                    // Set player's ability to jump to true
+                    player.canJump(true);
+        
+                    // Set player's ability to double jump to true
+                    player.canDoubleJump(true);
+
+                    // Return since the player is still on the starting platform
+                    return;
+                }
+                
+            }
+
+            // If the player is not on the statting platform set onPlatform to false
+            // Check Play Collision for ALL platforms
+            for (Platform platform : platforms)
+            {
+                // Variables that show the top of the platform, and the players previous position and current position
+                double platformTop = platform.getPosY();
+                double playerYPrev = player.getPrevPosY() + player.getHeight();
+                double playerYNow = player.getPosY() + player.getHeight();
+
+                // Check if player cross the platform because the fall speed was too large and made them go through
+                boolean crossedPlatform = 
+                    (playerYPrev <= platformTop) &&
+                    (playerYNow >= platformTop) &&
+                    (player.getPosX() + player.getWidth() > platform.getPosX()) &&
+                    (player.getPosX() < platform.getPosX() + platform.getLength()) &&
+                    (player.getFallSpeed() > 0);
+
+                // Check if the player is on the platform / crossed the platform due to too much speed
+                if (crossedPlatform)
+                {
+                    // Make sure the player doesn't clip through the platform
+                    player.setPosY(platform.getPosY() - player.getHeight());
+                        
+                    // Change fall speed to 0 so player doesn't fall through platform
+                    player.setFallSpeed(0.0);
+                        
+                    // Set onPlatform to true
+                    player.onPlatform(true);
+        
+                    // Set player's ability to jump to true
+                    player.canJump(true);
+
+                    // Set player's ability to double jump to true
+                    player.canDoubleJump(true);
+
+                    // Player is no longer on the starting platform as this platform was touched
+                    playerOnStart = false;
+                    break;
+                }
+                    
+                // If the player is not on a platform set onPlatform to false
+                else
+                {
+                    player.onPlatform(false);
+                }        
+            }
+        }
+
+        // Not sure if this is the best way to do this
+        if (multiplayerStarted) 
+        {
+            for (int i = 0; i < players.size(); i++)
+            {
+                // Get the player that it's checking
+                Player player = players.get(i);
+
+                // Starting Platform for Player and Boolean Check if they're on it
+                Platform sPlatform = null;
+                boolean onSPlatform = false;
+
+                // Get the starting platform for Player 1 and if they're on it
+                if (i == 0)
+                {
+                    sPlatform = startPlatform1;
+                    onSPlatform = player1OnStart;
+                }
+
+                // Get the starting platform for Player 2 and if they're on it
+                else if (i == 1)
+                {
+                    sPlatform = startPlatform2;
+                    onSPlatform = player2OnStart;
+                }
+
+                // Check if the player is on their starting platform
+                if (onSPlatform)
+                {
+                    // Variables that show the top of the starting platform, and the players previous position and current position
+                    double platformTop = sPlatform.getPosY();
+                    double playerYPrev = player.getPrevPosY() + player.getHeight();
+                    double playerYNow = player.getPosY() + player.getHeight();
+
+                    // Check if player crosses the starting platform because the fall speed was too large and made them go through
+                    boolean crossedPlatform = 
+                        (playerYPrev <= platformTop) &&
+                        (playerYNow >= platformTop) &&
+                        (player.getPosX() + player.getWidth() > sPlatform.getPosX()) &&
+                        (player.getPosX() < sPlatform.getPosX() + sPlatform.getLength()) &&
+                        (player.getFallSpeed() > 0);
+
+                    // If the player crossed the starting platform then make sure they land on it
+                    if (crossedPlatform)
                     {
-                        // Variables that show the top of the starting platform, and the players previous position and current position
-                        double platformTop = startPlatform.getPosY();
-                        double playerYPrev = player.getPrevPosY() + player.getHeight();
-                        double playerYNow = player.getPosY() + player.getHeight();
+                        // Make sure the player doesn't clip through the platform
+                        player.setPosY(sPlatform.getPosY() - player.getHeight());
+            
+                        // Change fall speed to 0 so player doesn't fall through platform
+                        player.setFallSpeed(0.0);
+                        
+                        // Set onPlatform to true
+                        player.onPlatform(true);
+            
+                        // Set player's ability to jump to true
+                        player.canJump(true);
+            
+                        // Set player's ability to double jump to true
+                        player.canDoubleJump(true);
 
-                        // Check if player crosses the starting platform because the fall speed was too large and made them go through
-                        boolean crossedPlatform = 
-                            (playerYPrev <= platformTop) &&
-                            (playerYNow >= platformTop) &&
-                            (player.getPosX() + player.getWidth() > startPlatform.getPosX()) &&
-                            (player.getPosX() < startPlatform.getPosX() + startPlatform.getLength()) &&
-                            (player.getFallSpeed() > 0);
-
-                        // If the player crossed the starting platform then make sure they land on it
-                        if (crossedPlatform) 
-                        {
-                            // Make sure the player doesn't clip through the platform
-                            player.setPosY(startPlatform.getPosY() - player.getHeight());
-
-                            // Change fall speed to 0 so player doesn't fall through platform
-                            player.setFallSpeed(0.0);
-
-                            // Set onPlatform to true
-                            player.onPlatform(true);
-
-                            // Set player's ability to jump to true
-                            player.canJump(true);
-
-                            // Set player's ability to double jump to true
-                            player.canDoubleJump(true);
-
-                            // Return since the player is still on the starting platform
-                            return;
-                        }
+                        // Don't check the red platforms if they're on the starting one
+                        continue;
                     }
+                }
 
-                    // If the player is not on the statting platform set onPlatform to false
-                    // Check Play Collision for ALL platforms
-                    for (Platform platform : platforms) 
+                // If the player is not on the statting platform set onPlatform to false
+                // Check Play Collision for ALL platforms
+                for (Platform platform : platforms)
+                {
+                    // Variables that show the top of the platform, and the players previous position and current position
+                    double platformTop = platform.getPosY();
+                    double playerYPrev = player.getPrevPosY() + player.getHeight();
+                    double playerYNow = player.getPosY() + player.getHeight();
+
+                    // Check if player cross the platform because the fall speed was too large and made them go through
+                    boolean crossedPlatform = 
+                        (playerYPrev <= platformTop) &&
+                        (playerYNow >= platformTop) &&
+                        (player.getPosX() + player.getWidth() > platform.getPosX()) &&
+                        (player.getPosX() < platform.getPosX() + platform.getLength()) &&
+                        (player.getFallSpeed() > 0);
+
+                    // Check if the player is on the platform / crossed the platform due to too much speed
+                    if (crossedPlatform)
                     {
-                        // Variables that show the top of the platform, and the players previous position and current position
-                        double platformTop = platform.getPosY();
-                        double playerYPrev = player.getPrevPosY() + player.getHeight();
-                        double playerYNow = player.getPosY() + player.getHeight();
+                        // Make sure the player doesn't clip through the platform
+                        player.setPosY(platform.getPosY() - player.getHeight());
+                            
+                        // Change fall speed to 0 so player doesn't fall through platform
+                        player.setFallSpeed(0.0);
+                            
+                        // Set onPlatform to true
+                        player.onPlatform(true);
+            
+                        // Set player's ability to jump to true
+                        player.canJump(true);
 
-                        // Check if player cross the platform because the fall speed was too large and made them go through
-                        boolean crossedPlatform = 
-                            (playerYPrev <= platformTop) &&
-                            (playerYNow >= platformTop) &&
-                            (player.getPosX() + player.getWidth() > platform.getPosX()) &&
-                            (player.getPosX() < platform.getPosX() + platform.getLength()) &&
-                            (player.getFallSpeed() > 0);
-                        // Check if the player is on the platform / crossed the platform due to too much speed
-                        if (crossedPlatform) 
-                        {
-                            // Make sure the player doesn't clip through the platform
-                            player.setPosY(platform.getPosY() - player.getHeight());
+                        // Set player's ability to double jump to true
+                        player.canDoubleJump(true);
 
-                            // Change fall speed to 0 so player doesn't fall through platform
-                            player.setFallSpeed(0.0);
-
-                            // Set onPlatform to true
-                            player.onPlatform(true);
-
-                            // Set player's ability to jump to true
-                            player.canJump(true);
-
-                            // Set player's ability to double jump to true
-                            player.canDoubleJump(true);
-
-                            // Player is no longer on the starting platform as this platform was touched
-                            playerOnStart = false;
-                            break;
-                        }
-                        // If the player is not on a platform set onPlatform to false
-                        else 
-                        {
-                            player.onPlatform(false);
-                        }
+                        // Player is no longer on the starting platform as this platform was touched
+                        onSPlatform = false;
+                        break;
                     }
+                        
+                    // If the player is not on a platform set onPlatform to false
+                    else
+                    {
+                        player.onPlatform(false);
+                    }        
                 }
             }
         }
@@ -861,6 +889,7 @@ public class PlatformPanic extends GameEngine
         {
             // Player array list to hold the players
             players = new ArrayList<>();
+
             double startX1 = mWidth / 4;
             double startY1 = mHeight / 2 - 60;
             double startX2 = mWidth * 3 / 4;
@@ -872,13 +901,15 @@ public class PlatformPanic extends GameEngine
 
             // Create Player 1
             Player player1 = new Player(startX1, startY1, 50, 50, acceleration, speed, fallSpeed, valid);
+            player1.setDirection("stop");
+
             // Create Player 2
             Player player2 = new Player(startX2, startY2, 50, 50, acceleration, speed, fallSpeed, valid);
+            player2.setDirection("stop");
 
             // Add the players to the players array list
             players.add(player1);
             players.add(player2);
-
         }
     }
 
@@ -917,42 +948,36 @@ public class PlatformPanic extends GameEngine
     //Start Platform
     public void startPlatform()
     {
-        if (singlePlayerStarted) {
-        double posX = mWidth / 2;
-        double posY = mHeight / 2;
-        double length = 50;
-        double width = 10;
-        double fallSpeed = 0.0;
+        if (singlePlayerStarted) 
+        {
+            double posX = mWidth / 2;
+            double posY = mHeight / 2;
+            double length = 50;
+            double width = 10;
+            double fallSpeed = 0.0;
 
-        startPlatform = new Platform(posX,posY,length,width,fallSpeed);
+            startPlatform = new Platform(posX,posY,length,width,fallSpeed);
         }
 
-        if (multiplayerStarted) {
+        if (multiplayerStarted) 
+        {
             // Create two starting platforms for multiplayer
             double posX1 = mWidth / 4;
             double posY1 = mHeight / 2;
             double posX2 = mWidth * 3 / 4;
             double posY2 = mHeight / 2;
-            double length1 = 50;
-            double length2 = 50;
-            double width1 = 10;
-            double width2 = 10;
-            double fallSpeed1 = 0.0;
-            double fallSpeed2 = 0.0;
+            double length = 50;
+            double width = 10;
+            double fallSpeed = 0.0;
 
             // Create Player 1's Start Platform
-            Platform startPlatform1 = new Platform(posX1, posY1, length1, width1, fallSpeed1);
+            startPlatform1 = new Platform(posX1, posY1, length, width, fallSpeed);
+
             // Create Player 2's Start Platform
-            Platform startPlatform2 = new Platform(posX2, posY2, length2, width2, fallSpeed2);
-            // Add the start platforms to the platforms array list
-            platforms.add(startPlatform1);
-            platforms.add(startPlatform2);
-
-
-        
+            startPlatform2 = new Platform(posX2, posY2, length, width, fallSpeed);
+        }
     }
 
-    }
     //Gameover (Works, needs paint / resets on key?)
     public void gameover()
     {
