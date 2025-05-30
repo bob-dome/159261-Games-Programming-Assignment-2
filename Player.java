@@ -5,7 +5,6 @@ public class Player
     double posY;
     int width;
     int height;
-    int spriteID;
     //Gravity/Acceleration factor/jump height between sprite models/individual players?
     //Maybe character select feature?
     int acceleration;
@@ -29,12 +28,11 @@ public class Player
     String direction;
 
     // Constructor
-    public Player(double posX, double posY, int width, int height, int spriteID, int acceleration, double speed, double fallSpeed, boolean valid) {
+    public Player(double posX, double posY, int width, int height, int acceleration, double speed, double fallSpeed, boolean valid) {
         this.posX = posX;
         this.posY = posY;
         this.width = width;
         this.height = height;
-        this.spriteID = spriteID;
         this.speed = speed;
         this.acceleration = acceleration;
         this.fallSpeed = fallSpeed;
@@ -58,10 +56,6 @@ public class Player
     public int getHeight()
     {
         return height;
-    }
-
-    public int getSpriteID() {
-        return spriteID;
     }
 
     public int getAcceleration() {
@@ -138,7 +132,7 @@ public class Player
 
             // Debug
             System.out.println("Player Jump");
-        } else if (doubleJump && !on && !jump) {
+        } else if (doubleJump && !on) {
             doubleJump = false;
             fallSpeed = -15;
 

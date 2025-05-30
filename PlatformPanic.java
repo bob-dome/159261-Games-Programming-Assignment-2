@@ -1,6 +1,7 @@
 // 24006168 Jordan Burmeister, 24003491 Wiremu Loader, 24002464 Aimee Gaskin Fryer, 19028995 Ralph Ingley
 
 import java.awt.*;
+import java.awt.RenderingHints.Key;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -38,6 +39,9 @@ public class PlatformPanic extends GameEngine
     ArrayList<Platform> platforms;
     int platformAmount = 10;
     boolean playerOnStart = true;
+
+    // Multiplayer players list
+    ArrayList<Player> players;
 
     // Grid Variables
     int gridColumns;
@@ -117,6 +121,7 @@ public class PlatformPanic extends GameEngine
     @Override
     public void update(double dt) 
     {
+        // Single Player
         if (singlePlayerStarted) 
         {
             if (!gamePaused) 
@@ -193,11 +198,22 @@ public class PlatformPanic extends GameEngine
         else if (multiplayerStarted) 
         {
             
-            clearBackground(mWidth, mHeight);
-            //Background
-            drawImage(Background, 0, 0, 800, 500);
-            
-            clearBackground(mWidth, mHeight);
+           clearBackground(mWidth, mHeight);
+            drawImage(Background, 0, 0, mWidth, mHeight);
+
+            if (playerOnStart && players != null && players.size() >= 2) 
+            {
+                // Draw Start Platforms for both players
+                drawSolidRectangle((int) startPlatform.getPosX(), (int) startPlatform.getPosY(), startPlatform.getLength(), startPlatform.getWidth());
+                drawSolidRectangle((int) (startPlatform.getPosX() + mWidth / 2), (int) startPlatform.getPosY(), startPlatform.getLength(), startPlatform.getWidth());
+            }
+
+            for (Platform platform : platforms) 
+            {
+                changeColor(red);
+                drawSolidRectangle(platform.getPosX(), platform.getPosY(), platform.getLength(), platform.getWidth());
+            }
+
         }
         
         // Menu Background
@@ -334,7 +350,7 @@ public class PlatformPanic extends GameEngine
         if (!gamePaused)
         {
             // Player movement for when the game has started
-            if(singlePlayerStarted || multiplayerStarted)  
+            if(singlePlayerStarted)  
             {
                 if (keyCode == KeyEvent.VK_LEFT ) 
                 {
@@ -359,6 +375,22 @@ public class PlatformPanic extends GameEngine
 
                     drawImage(ToucanJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
                 }
+
+                // Multiplayer Player Movement
+                if (multiplayerStarted) 
+                {
+                    if (keyCode == KeyEvent.VK_W) {
+                        // Player 2 jump
+                        players.get(0).setDirection("up");
+                        System.out.println("Player 2 Jump");
+                    }
+                    if (keyCode == KeyEvent.VK_UP) {
+                        // Player 1 jump
+                        players.get(1).setDirection("up");
+                        System.out.println("Player 1 Jump");
+                    }
+                    
+                }
             }
         }
 
@@ -374,6 +406,7 @@ public class PlatformPanic extends GameEngine
         }
     }
 
+    // Key Released for Player Movement
     public void keyReleased(KeyEvent event) 
     {
         int keyCode = event.getKeyCode();
@@ -387,8 +420,12 @@ public class PlatformPanic extends GameEngine
         }
     }
 
+    // Player Movement Function
     public void playermovement() 
     {
+        // Player Movement for Single Player
+        if (singlePlayerStarted) {
+
         if (direction.equals("left")) 
         {
             player.setPosX(player.getPosX() - player.getSpeed());
@@ -405,6 +442,48 @@ public class PlatformPanic extends GameEngine
             player.setPosX(player.getPosX());
         }
     }
+        // Player Movement for Multiplayer
+        if (multiplayerStarted && players != null && players.size() >= 2) {
+            // Player Movement for Multiplayer
+            Player player1 = players.get(0);
+            Player player2 = players.get(1);
+
+            if (player1.getDirection().equals("left")) 
+            {
+                player1.setPosX(player1.getPosX() - player1.getSpeed());
+            }
+
+            if (player1.getDirection().equals("right")) 
+            {
+                player1.setPosX(player1.getPosX() + player1.getSpeed());
+            }
+
+            if (player1.getDirection().equals("stop")) 
+            {
+                player1.setPosY(player1.getPosY());
+                player1.setPosX(player1.getPosX());
+            }
+
+            if (player2.getDirection().equals("left")) 
+            {
+                player2.setPosX(player2.getPosX() - player2.getSpeed());
+            }
+
+            if (player2.getDirection().equals("right")) 
+            {
+                player2.setPosX(player2.getPosX() + player2.getSpeed());
+            }
+
+            if (player2.getDirection().equals("stop")) 
+            {
+                player2.setPosY(player2.getPosY());
+                player2.setPosX(player2.getPosX());
+                }
+                    
+                }
+            }
+        
+    
 
 
     public static void main(String[] args) 
@@ -442,6 +521,19 @@ public class PlatformPanic extends GameEngine
 
         // Debug
         System.out.println("Multiplayer Started");
+
+        // Create the Platforms
+        createPlatforms();
+
+        // Create Players
+        createPlayer();
+
+        // Create Start platform
+        startPlatform();
+
+
+
+
     }
 
     // Create Platform Objects
@@ -565,6 +657,8 @@ public class PlatformPanic extends GameEngine
     // Player Platform Collision Detection
     public void playerPlatformCollision()
     { 
+        if (singlePlayerStarted) 
+        {
         // Check if the player is on the starting platform
         if (playerOnStart)
         {
@@ -602,6 +696,7 @@ public class PlatformPanic extends GameEngine
                 // Return since the player is still on the starting platform
                 return;
             }
+            
         }
 
         // If the player is not on the statting platform set onPlatform to false
@@ -651,8 +746,101 @@ public class PlatformPanic extends GameEngine
             }        
         }
     }
+        // Not sure if this is the best way to do this
+        if (multiplayerStarted) {
+            // Ensure players list is initialized and has players
+            if (players != null && !players.isEmpty()) {
+                // Check if the players are on the starting platform
+                for (Player player : players) 
+                {
+                    if (playerOnStart) 
+                    {
+                        // Variables that show the top of the starting platform, and the players previous position and current position
+                        double platformTop = startPlatform.getPosY();
+                        double playerYPrev = player.getPrevPosY() + player.getHeight();
+                        double playerYNow = player.getPosY() + player.getHeight();
 
-    //Player creation:
+                        // Check if player crosses the starting platform because the fall speed was too large and made them go through
+                        boolean crossedPlatform = 
+                            (playerYPrev <= platformTop) &&
+                            (playerYNow >= platformTop) &&
+                            (player.getPosX() + player.getWidth() > startPlatform.getPosX()) &&
+                            (player.getPosX() < startPlatform.getPosX() + startPlatform.getLength()) &&
+                            (player.getFallSpeed() > 0);
+
+                        // If the player crossed the starting platform then make sure they land on it
+                        if (crossedPlatform) 
+                        {
+                            // Make sure the player doesn't clip through the platform
+                            player.setPosY(startPlatform.getPosY() - player.getHeight());
+
+                            // Change fall speed to 0 so player doesn't fall through platform
+                            player.setFallSpeed(0.0);
+
+                            // Set onPlatform to true
+                            player.onPlatform(true);
+
+                            // Set player's ability to jump to true
+                            player.canJump(true);
+
+                            // Set player's ability to double jump to true
+                            player.canDoubleJump(true);
+
+                            // Return since the player is still on the starting platform
+                            return;
+                        }
+                    }
+
+                    // If the player is not on the statting platform set onPlatform to false
+                    // Check Play Collision for ALL platforms
+                    for (Platform platform : platforms) 
+                    {
+                        // Variables that show the top of the platform, and the players previous position and current position
+                        double platformTop = platform.getPosY();
+                        double playerYPrev = player.getPrevPosY() + player.getHeight();
+                        double playerYNow = player.getPosY() + player.getHeight();
+
+                        // Check if player cross the platform because the fall speed was too large and made them go through
+                        boolean crossedPlatform = 
+                            (playerYPrev <= platformTop) &&
+                            (playerYNow >= platformTop) &&
+                            (player.getPosX() + player.getWidth() > platform.getPosX()) &&
+                            (player.getPosX() < platform.getPosX() + platform.getLength()) &&
+                            (player.getFallSpeed() > 0);
+                        // Check if the player is on the platform / crossed the platform due to too much speed
+                        if (crossedPlatform) 
+                        {
+                            // Make sure the player doesn't clip through the platform
+                            player.setPosY(platform.getPosY() - player.getHeight());
+
+                            // Change fall speed to 0 so player doesn't fall through platform
+                            player.setFallSpeed(0.0);
+
+                            // Set onPlatform to true
+                            player.onPlatform(true);
+
+                            // Set player's ability to jump to true
+                            player.canJump(true);
+
+                            // Set player's ability to double jump to true
+                            player.canDoubleJump(true);
+
+                            // Player is no longer on the starting platform as this platform was touched
+                            playerOnStart = false;
+                            break;
+                        }
+                        // If the player is not on a platform set onPlatform to false
+                        else 
+                        {
+                            player.onPlatform(false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Player creation:
     public void createPlayer() 
     {
         // Create 1 player in the middle if it's a single player game
@@ -660,25 +848,44 @@ public class PlatformPanic extends GameEngine
         {
             double startX = mWidth / 2;
             double startY = mHeight / 2 - 60;
-            int spriteID = 0;
             int acceleration = 1;
             double speed = 5.0;
             double fallSpeed = 10.0;
             boolean valid = true;
     
-            player = new Player(startX, startY, 50, 50, spriteID, acceleration, speed, fallSpeed, valid);
+            player = new Player(startX, startY, 50, 50, acceleration, speed, fallSpeed, valid);
         }
 
         // Create 2 players one on the left one on the right if it's a multiplayer game
         if (multiplayerStarted)
         {
-            
+            // Player array list to hold the players
+            players = new ArrayList<>();
+            double startX1 = mWidth / 4;
+            double startY1 = mHeight / 2 - 60;
+            double startX2 = mWidth * 3 / 4;
+            double startY2 = mHeight / 2 - 60;
+            int acceleration = 1;
+            double speed = 5.0;
+            double fallSpeed = 10.0;
+            boolean valid = true;
+
+            // Create Player 1
+            Player player1 = new Player(startX1, startY1, 50, 50, acceleration, speed, fallSpeed, valid);
+            // Create Player 2
+            Player player2 = new Player(startX2, startY2, 50, 50, acceleration, speed, fallSpeed, valid);
+
+            // Add the players to the players array list
+            players.add(player1);
+            players.add(player2);
+
         }
     }
 
     // Player Movement
     public void playergravity(double dt) 
     {
+        if (singlePlayerStarted) {
         // Set Gravity
         double gravity = 1;
 
@@ -690,11 +897,27 @@ public class PlatformPanic extends GameEngine
 
         // Set Player's Fall
         player.setPosY(player.getPosY() + player.getFallSpeed());
+        }
+        if (multiplayerStarted && players != null && players.size() >= 2) {
+            // Set Gravity for Player 1
+            double gravity = 1;
+            Player player1 = players.get(0);
+            player1.setPrevPosY(player1.getPosY());
+            player1.setFallSpeed(player1.getFallSpeed() + gravity);
+            player1.setPosY(player1.getPosY() + player1.getFallSpeed());
+
+            // Set Gravity for Player 2
+            Player player2 = players.get(1);
+            player2.setPrevPosY(player2.getPosY());
+            player2.setFallSpeed(player2.getFallSpeed() + gravity);
+            player2.setPosY(player2.getPosY() + player2.getFallSpeed());
+        }
     }
 
     //Start Platform
     public void startPlatform()
     {
+        if (singlePlayerStarted) {
         double posX = mWidth / 2;
         double posY = mHeight / 2;
         double length = 50;
@@ -702,24 +925,69 @@ public class PlatformPanic extends GameEngine
         double fallSpeed = 0.0;
 
         startPlatform = new Platform(posX,posY,length,width,fallSpeed);
+        }
+
+        if (multiplayerStarted) {
+            // Create two starting platforms for multiplayer
+            double posX1 = mWidth / 4;
+            double posY1 = mHeight / 2;
+            double posX2 = mWidth * 3 / 4;
+            double posY2 = mHeight / 2;
+            double length1 = 50;
+            double length2 = 50;
+            double width1 = 10;
+            double width2 = 10;
+            double fallSpeed1 = 0.0;
+            double fallSpeed2 = 0.0;
+
+            // Create Player 1's Start Platform
+            Platform startPlatform1 = new Platform(posX1, posY1, length1, width1, fallSpeed1);
+            // Create Player 2's Start Platform
+            Platform startPlatform2 = new Platform(posX2, posY2, length2, width2, fallSpeed2);
+            // Add the start platforms to the platforms array list
+            platforms.add(startPlatform1);
+            platforms.add(startPlatform2);
+
+
+        
+    }
+
     }
     //Gameover (Works, needs paint / resets on key?)
     public void gameover()
     {
-        //System.out.println(player.posY);
-        if (player.posY >= mHeight)
+        // Single Player Game Over
+        if (singlePlayerStarted && player != null)
         {
-            // Game Over
-            System.out.println("Gameover");
-            singlePlayerStarted = false;
-            gameOver = true;
-
-            // Save Highscore if the highscore is greater than the score
-            if (score > highscore)
+            if (player.posY >= mHeight)
             {
-                // Since the score goes up in such fast succession there is a difference of 1 on recorded score
-                highscore = score - 1;
-                saveHighscore();
+                // Game Over
+                System.out.println("Gameover");
+                singlePlayerStarted = false;
+                gameOver = true;
+
+                // Save Highscore if the highscore is greater than the score
+                if (score > highscore)
+                {
+                    // Since the score goes up in such fast succession there is a difference of 1 on recorded score
+                    highscore = score - 1;
+                    saveHighscore();
+                }
+            }
+        }
+        // Multiplayer Game Over
+        if (multiplayerStarted && players != null && !players.isEmpty())
+        {
+            boolean anyPlayerOut = false;
+            for (Player p : players) {
+                if (p != null && p.getPosY() >= mHeight) {
+                    anyPlayerOut = true;
+                    break;
+                }
+            }
+            if (anyPlayerOut) {
+                multiplayerStarted = false;
+                gameOver = true;
             }
         }
     }
@@ -727,6 +995,7 @@ public class PlatformPanic extends GameEngine
     //CheckBounds (used to keep player onscreen)
     public void checkbounds()
     {
+        if (singlePlayerStarted) {
         if (player.getPosX() < 0)
         {
             player.setPosX(0);
@@ -735,6 +1004,30 @@ public class PlatformPanic extends GameEngine
         else if (player.getPosX() > mWidth - 5)
         {
             player.setPosX(mWidth - 5);
+        }
+    }
+        if (multiplayerStarted && players != null && players.size() >= 2) {
+            // Check Player 1 Bounds
+            Player player1 = players.get(0);
+            if (player1.getPosX() < 0) 
+            {
+                player1.setPosX(0);
+            } 
+            else if (player1.getPosX() > mWidth - 5) 
+            {
+                player1.setPosX(mWidth - 5);
+            }
+
+            // Check Player 2 Bounds
+            Player player2 = players.get(1);
+            if (player2.getPosX() < 0) 
+            {
+                player2.setPosX(0);
+            } 
+            else if (player2.getPosX() > mWidth - 5) 
+            {
+                player2.setPosX(mWidth - 5);
+            }
         }
     }
 
