@@ -492,26 +492,29 @@ public class PlatformPanic extends GameEngine
     public void playermovement() 
     {
         // Player Movement for Single Player
-        if (singlePlayerStarted) {
-
-        if (direction.equals("left")) 
+        if (singlePlayerStarted) 
         {
-            player.setPosX(player.getPosX() - player.getSpeed());
+
+            if (direction.equals("left")) 
+            {
+                player.setPosX(player.getPosX() - player.getSpeed());
+            }
+
+            if (direction.equals("right")) 
+            {
+                player.setPosX(player.getPosX() + player.getSpeed());
+            }
+
+            if (direction.equals("stop")) 
+            {
+                player.setPosY(player.getPosY());
+                player.setPosX(player.getPosX());
+            }
         }
 
-        if (direction.equals("right")) 
-        {
-            player.setPosX(player.getPosX() + player.getSpeed());
-        }
-
-        if (direction.equals("stop")) 
-        {
-            player.setPosY(player.getPosY());
-            player.setPosX(player.getPosX());
-        }
-    }
         // Player Movement for Multiplayer
-        if (multiplayerStarted && players != null && players.size() >= 2) {
+        if (multiplayerStarted && players != null && players.size() >= 2) 
+        {
             // Player Movement for Multiplayer
             Player player1 = players.get(0);
             Player player2 = players.get(1);
@@ -546,11 +549,9 @@ public class PlatformPanic extends GameEngine
             {
                 player2.setPosY(player2.getPosY());
                 player2.setPosX(player2.getPosX());
-                }
-                    
-                }
-            }
-        
+            }          
+        }
+    }
     
 
 
@@ -912,7 +913,9 @@ public class PlatformPanic extends GameEngine
                         player.canDoubleJump(true);
 
                         // Player is no longer on the starting platform as this platform was touched
-                        onSPlatform = false;
+                        if (i == 0) player1OnStart = false;
+                        else if (i == 1) player2OnStart = false;
+                        
                         break;
                     }
                         
