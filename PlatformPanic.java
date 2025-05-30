@@ -18,20 +18,20 @@ public class PlatformPanic extends GameEngine
     String direction = "stop";
 
     // Main Menu & Pause
-    private static boolean gamePaused;
-    private static boolean menu;
-    private static boolean gameOver;
+    private boolean gamePaused;
+    private boolean menu;
+    private boolean gameOver;
     
     // Score & Highscore
-    private static int score;
-    private static int highscore;
+    private int score;
+    private int highscore;
     boolean startScore;
     
     // Single Player Variables
-    private static boolean singlePlayerStarted;
+    private boolean singlePlayerStarted;
     
     // Multiplayer Variables
-    private static boolean multiplayerStarted;
+    private boolean multiplayerStarted;
     
     // Platforms Array List holds every platform so it can be cleared and reused on game end | Start Platform is where the player spawns
     Platform startPlatform;
@@ -196,7 +196,10 @@ public class PlatformPanic extends GameEngine
 
             // Display Score
             changeColor(white);
-            drawText(mWidth / mWidth + 10, mHeight / mHeight + 50, "" + score, "Arial", 40);
+            drawText(mWidth / mWidth + 10, mHeight / mHeight + 50, "Score:" + score, "Arial", 20);
+
+            // Display the Highscore
+            drawText(mWidth / mWidth + 10, mHeight / mHeight + 75, "HighScore: " + highscore, "Arial", 20);
         }
         
         // Create Multiplayer background etc
@@ -261,17 +264,16 @@ public class PlatformPanic extends GameEngine
             // check if the user presses on this area
             drawText(200, 400, "       Multiplayer", "Arial", 50);
         }
-        //else if (resetGame()){
-            //}
             
-            if (gameOver){
-                changeBackgroundColor(Color.BLACK);
-                changeColor(Color.RED);
-                drawText(200, 200, "GAME OVER!", "Arial", 50);
-            }
+        if (gameOver)
+        {
+            changeBackgroundColor(Color.BLACK);
+            changeColor(Color.RED);
+            drawText(200, 200, "GAME OVER!", "Arial", 50);
+        }
             
-            if (gamePaused) 
-            {
+        if (gamePaused) 
+        {
             changeColor(Color.BLACK);
             drawText(mWidth / 2 - 100, mHeight / 2 - 50, "Game Paused", "Arial", 50);
             drawText(mWidth / 2 - 150, mHeight / 2 + 50, "Press ESC to Resume", "Arial", 30);
@@ -293,7 +295,7 @@ public class PlatformPanic extends GameEngine
     private void saveHighscore() 
     {
         // Change txt file path to proper path
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("hightscore.txt"))) 
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("resources/highscore.txt"))) 
         {
             writer.write(String.valueOf(highscore));
         }
@@ -451,9 +453,17 @@ public class PlatformPanic extends GameEngine
         {
             if (keyCode == KeyEvent.VK_ENTER || keyCode == KeyEvent.VK_SPACE) 
             {
-                resetGame();
-                startSinglePlayer();
-                gameOver = false;
+                if (singlePlayerStarted)
+                {
+                    resetGame();
+                    startSinglePlayer();
+                }
+
+                if (multiplayerStarted)
+                {
+                    resetGame();
+                    startMultiplayer();
+                }
             }
         }
     }
@@ -915,7 +925,7 @@ public class PlatformPanic extends GameEngine
                         // Player is no longer on the starting platform as this platform was touched
                         if (i == 0) player1OnStart = false;
                         else if (i == 1) player2OnStart = false;
-                        
+
                         break;
                     }
                         
@@ -1043,7 +1053,7 @@ public class PlatformPanic extends GameEngine
     public void gameover()
     {
         // Single Player Game Over
-        if (singlePlayerStarted && player != null)
+        if (singlePlayerStarted)
         {
             if (player.posY >= mHeight)
             {
@@ -1061,8 +1071,9 @@ public class PlatformPanic extends GameEngine
                 }
             }
         }
+
         // Multiplayer Game Over
-        if (multiplayerStarted && players != null && !players.isEmpty())
+        if (multiplayerStarted)
         {
             boolean anyPlayerOut = false;
             for (Player p : players) {
@@ -1131,5 +1142,10 @@ public class PlatformPanic extends GameEngine
 
         // Set Player to be on Start
         playerOnStart = true;
+        player1OnStart = true;
+        player2OnStart = true;
+
+        // Clear the players
+        players.clear();
     }
 }
