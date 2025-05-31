@@ -22,7 +22,10 @@ public class PlatformPanic extends GameEngine
     private boolean gamePaused;
     private boolean menu;
     private boolean gameOver;
-    
+    private boolean instructions1;
+    private boolean instructions2;
+    private boolean victory;
+    private boolean resetscores;
     // Score & Highscore
     private int score;
     private int highscore;
@@ -246,23 +249,42 @@ public class PlatformPanic extends GameEngine
             for (Player player : players)
             {
                 //Player animations (jumping, left, right, idle)
-                if (!player.jump){
-                    drawImage(ParrotJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
-                }
-                else if (player.direction.equals("left")) {
-                    player.setLastDirection("left");
-                    drawImage(ParrotWalk, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
-                } else if (player.direction.equals("right")){
-                    player.setLastDirection("right");
-                    drawImage(ParrotWalkFlipped, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
-                }
-                else{
-                    //If the player last moved a certain direction, the idle player will be facing that direction.
-                    if (player.getLastDirection().equals("left")){
-                        drawImage(Parrot, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                Player player1 = players.get(0);
+                Player player2 = players.get(1);
+                if(player == player1) {
+                    if (!player1.jump) {
+                        drawImage(ToucanJump, player1.getPosX(), player1.getPosY(), player1.getWidth(), player1.getHeight());
+                    } else if (player1.direction.equals("left")) {
+                        player1.setLastDirection("left");
+                        drawImage(ToucanWalk, player1.getPosX(), player1.getPosY(), player1.getWidth(), player1.getHeight());
+                    } else if (player1.direction.equals("right")) {
+                        player1.setLastDirection("right");
+                        drawImage(ToucanWalkFlipped, player1.getPosX(), player1.getPosY(), player1.getWidth(), player1.getHeight());
+                    } else {
+                        //If the player last moved a certain direction, the idle player will be facing that direction.
+                        if (player1.getLastDirection().equals("left")) {
+                            drawImage(Toucan, player1.getPosX(), player1.getPosY(), player1.getWidth(), player1.getHeight());
+                        } else if (player1.getLastDirection().equals("right")) {
+                            drawImage(ToucanFlipped, player1.getPosX(), player1.getPosY(), player1.getWidth(), player1.getHeight());
+                        }
                     }
-                    else if (player.getLastDirection().equals("right")){
-                        drawImage(ParrotFlipped, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                }
+                if(player == player2) {
+                    if (!player2.jump) {
+                        drawImage(ParrotJump, player2.getPosX(), player2.getPosY(), player2.getWidth(), player2.getHeight());
+                    } else if (player2.direction.equals("left")) {
+                        player2.setLastDirection("left");
+                        drawImage(ParrotWalk, player2.getPosX(), player2.getPosY(), player2.getWidth(), player2.getHeight());
+                    } else if (player2.direction.equals("right")) {
+                        player2.setLastDirection("right");
+                        drawImage(ParrotWalkFlipped, player2.getPosX(), player2.getPosY(), player2.getWidth(), player2.getHeight());
+                    } else {
+                        //If the player last moved a certain direction, the idle player will be facing that direction.
+                        if (player2.getLastDirection().equals("left")) {
+                            drawImage(Parrot, player2.getPosX(), player2.getPosY(), player2.getWidth(), player2.getHeight());
+                        } else if (player2.getLastDirection().equals("right")) {
+                            drawImage(ParrotFlipped, player2.getPosX(), player2.getPosY(), player2.getWidth(), player2.getHeight());
+                        }
                     }
                 }
 
@@ -308,25 +330,94 @@ public class PlatformPanic extends GameEngine
             
             // Draw Single Player Label, this can be changed later on to a button or we can
             // check if the user presses on this area
-            drawText(200, 300, "     Single Player", "Arial", 50);
+            drawText(150, 250, "     Single Player  (1)", "Arial", 50);
             
             // Draw Multiplayer Label, this can be changed later on to a button or we can
             // check if the user presses on this area
-            drawText(200, 400, "       Multiplayer", "Arial", 50);
+            drawText(150, 325, "       Multiplayer  (2)", "Arial", 50);
+            // Draw Instructions Label, this can be changed later on to a button or we can
+            // check if the user presses on this area
+            drawText(150, 400, "       Instructions (3)", "Arial", 50);
+
+            drawText(150, 475, "          Quit (Esc)", "Arial", 50);
+
         }
             
         if (gameOver)
         {
             changeBackgroundColor(Color.BLACK);
             changeColor(Color.RED);
-            drawText(200, 200, "GAME OVER!", "Arial", 50);
+            drawText(250, 200, "GAME OVER!", "Arial", 50);
+            drawText(270, 300, "Press SPACE to Retry", "Arial", 30);
+            drawText(290, 350, "Press ESC to Menu", "Arial", 30);
+
         }
             
         if (gamePaused) 
         {
+            if(victory){
+                changeColor(Color.RED);
+                drawText(250, 200, "GAME OVER!", "Arial", 40);
+                changeColor(Color.GREEN);
+                if(winP2>winP1){
+                    drawText(250, 260, "Player 2 Wins! ","Arial", 40);
+                }else{
+                    drawText(250, 260, "Player 1 Wins! ","Arial", 40);
+                }
+            }else {
+                changeColor(Color.BLACK);
+                drawText(mWidth / 2 - 150, mHeight / 2 - 50, "Game Paused", "Arial", 50);
+                drawText(mWidth / 2 - 110, mHeight / 2 + 50, "Press P to Resume", "Arial", 30);
+                drawText(mWidth / 2 - 110, mHeight / 2 + 100, "Press Esc to Menu", "Arial", 30);
+            }
+        }
+
+        if(instructions1){
+            System.out.println("Instructions1");
+            clearBackground(mWidth, mHeight);
+            //Background
+            drawImage(Background, 0, 0, 800, 500);
+            //Logo
+            drawImage(Logo, 175, -50, 472, 328);
             changeColor(Color.BLACK);
-            drawText(mWidth / 2 - 100, mHeight / 2 - 50, "Game Paused", "Arial", 50);
-            drawText(mWidth / 2 - 150, mHeight / 2 + 50, "Press ESC to Resume", "Arial", 30);
+            drawText(290, 225 , "Singleplayer:", "Arial", 40);
+            drawText(170, 275 , "Move the player using the arrow keys", "Arial", 30);
+            drawText(230, 325 , "onto the falling platforms.", "Arial", 30);
+            drawText(195, 375 , "Your aim to survive as long as", "Arial", 30);
+            drawText(250, 425 , "possible without falling.", "Arial", 30);
+            drawText(180, 475 , "(Next: Right arrowkey , Menu: Esc)", "Arial", 30);
+
+        }
+        if(instructions2){
+            System.out.println("Instructions2");
+            clearBackground(mWidth, mHeight);
+            //Background
+            drawImage(Background, 0, 0, 800, 500);
+            //Logo
+            drawImage(Logo, 175, -50, 472, 328);
+            changeColor(Color.BLACK);
+            drawText(300, 225 , "Multiplayer:", "Arial", 40);
+            drawText(170, 275 , "Move player 1 using the arrow keys", "Arial", 30);
+            drawText(230, 325 , "and player 2 using WASD.", "Arial", 30);
+            drawText(220, 375 , "If the other player falls first, ", "Arial", 30);
+            drawText(200, 425 , "you get a point. First to 5 wins!", "Arial", 30);
+            drawText(190, 475 , "(Back: Left arrowkey , Menu: Esc)", "Arial", 30);
+
+        }
+        if(victory){
+            changeColor(Color.RED);
+            drawText(250, 200, "GAME OVER!", "Arial", 40);
+            changeColor(Color.GREEN);
+            if(winP2>winP1){
+                drawText(250, 260, "Player 2 Wins! ","Arial", 40);
+            }else{
+                drawText(250, 260, "Player 1 Wins! ","Arial", 40);
+            }
+            changeColor(Color.BLACK);
+            drawText(150, 350, "Press Space for Rematch","Arial", 40);
+            drawText(200, 400, "Press Esc to Menu","Arial", 40);
+
+
         }
     }
     
@@ -337,7 +428,7 @@ public class PlatformPanic extends GameEngine
         if (singlePlayerStarted)
         {
             // Check that the starting platform is gone
-            if (!playerOnStart)
+            if (!playerOnStart&& !gameOver)
             {
                 score += 1;
             }
@@ -346,16 +437,22 @@ public class PlatformPanic extends GameEngine
         // Multiplayer Wins | Whoever survives add 1 to win
         if (multiplayerStarted)
         {
+
+
             // If Player 1 falls add 1 to Player 2 wins
             if (players.get(0).getPosY() > mHeight)
             {
-                winP2++;
+                if(!gameOver) {
+                    winP2++;
+                }
             }
 
             // If player 2 falls add 1 to Player 1 Wins
             if (players.get(1).getPosY() > mHeight)
             {
-                winP1++;
+                if(!gameOver) {
+                    winP1++;
+                }
             }
         }
     }
@@ -416,17 +513,72 @@ public class PlatformPanic extends GameEngine
             {
                 startMultiplayer();
             }
+            else if(keyCode == KeyEvent.VK_3){
+                instructions1 = true;
+                menu = false;
+
+            }
+        }
+        if(instructions1){
+            if (keyCode == KeyEvent.VK_RIGHT) {
+                //System.out.println("RIGHT pressed in instr1");
+                instructions1 = false;
+                instructions2 = true;
+            }
+        }
+        if(instructions2){
+            if (keyCode == KeyEvent.VK_LEFT) {
+                //System.out.println("LEFT pressed in instr2");
+                instructions2 = false;
+                instructions1 = true;
+
+            }
         }
         // When the player presses the escape key it pauses the game
         if (keyCode == KeyEvent.VK_ESCAPE) 
         {
-            if (!gamePaused) 
+            gamePaused = false;
+            if(menu){
+                System.exit(0);
+            }
+            if(instructions1){
+                instructions1 = false;
+                menu = true;
+            }
+            if(instructions2){
+                instructions2 = false;
+                menu = true;
+            }
+            if(singlePlayerStarted || multiplayerStarted){
+                if(singlePlayerStarted){
+                    platforms.clear();
+                    gameOver = false;
+                    singlePlayerStarted = false;
+                    playerOnStart = true;
+                }
+                if(multiplayerStarted){
+                    gameOver = false;
+                    platforms.clear();
+                    winP1 = 0;
+                    winP2 = 0;
+                    multiplayerStarted = false;
+                    player1OnStart = true;
+                    player2OnStart = true;
+
+                }
+                menu = true;
+            }
+
+
+        }
+        if (keyCode == KeyEvent.VK_P){
+            if (!gamePaused && (singlePlayerStarted || multiplayerStarted))
             {
                 // If the game is not paused then pause it
                 System.out.println("Game Paused");
                 gamePaused = true;
-            } 
-            else 
+            }
+            else
             {
                 // If the game is paused then unpause it
                 System.out.println("Game Resumed");
@@ -468,63 +620,82 @@ public class PlatformPanic extends GameEngine
             // Multiplayer Player Movement
             if (multiplayerStarted) 
             {
+                Player player1 = players.get(0);
+                Player player2 = players.get(1);
                 // Jump Movement
                 if (keyCode == KeyEvent.VK_UP) 
                 {
                     // Player 1 jump
-                    players.get(0).setDirection("up");
+                    player1.setDirection("up");
 
                     // Lets the player jump and double jump
-                    players.get(0).jump();
+                    player1.jump();
 
-                    drawImage(ToucanJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                    drawImage(ToucanJump, player1.getPosX(), player1.getPosY(), player1.getWidth(), player1.getHeight());
                 }
 
                 if (keyCode == KeyEvent.VK_W) 
                 {
                     // Player 2 jump
-                    players.get(1).setDirection("up");
+                    player2.setDirection("up");
 
                     // Lets the player jump and double jump
-                    players.get(1).jump();
+                    player2.jump();
 
-                    drawImage(ToucanJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                    drawImage(ParrotJump, player2.getPosX(), player2.getPosY(), player2.getWidth(), player2.getHeight());
                 }
                 
                 // Left Movement
                 if (keyCode == KeyEvent.VK_LEFT) 
                 {
-                    players.get(0).setDirection("left");
+                    player1.setDirection("left");
                 }
 
                 if (keyCode == KeyEvent.VK_A) 
                 {
                     // Player 1 jump
-                    players.get(1).setDirection("left");
+                    player2.setDirection("left");
                 }
 
                 // Right Movement
                 if (keyCode == KeyEvent.VK_RIGHT) 
                 {
                     // Player 2 jump
-                    players.get(0).setDirection("right");
+                    player1.setDirection("right");
                 }
 
                 if (keyCode == KeyEvent.VK_D) 
                 {
                     // Player 1 jump
-                    players.get(1).setDirection("right");
+                    player2.setDirection("right");
                 }
+            }
+        }
+        if(victory){
+            if (keyCode == KeyEvent.VK_SPACE)
+            {
+                gamePaused = false;
+                resetscores = true;
+                resetGame();
+                victory = false;
+                startMultiplayer();
+            }
+            if (keyCode == KeyEvent.VK_ESCAPE)
+            {
+                victory = false;
+                multiplayerStarted = false;
+                menu = true;
             }
         }
 
         // To reset the game back to single player hit enter or space
         if (gameOver)
         {
-            if (keyCode == KeyEvent.VK_ENTER || keyCode == KeyEvent.VK_SPACE) 
+            if (keyCode == KeyEvent.VK_SPACE)
             {
                 if (singlePlayerStarted)
                 {
+                    gameOver = false;
                     resetGame();
                     startSinglePlayer();
                 }
@@ -537,6 +708,7 @@ public class PlatformPanic extends GameEngine
             }
         }
     }
+
 
     // Key Released for Player Movement
     public void keyReleased(KeyEvent event) 
@@ -554,16 +726,18 @@ public class PlatformPanic extends GameEngine
         // If the game is in multiplayer and either player has stopped holding a key down
         if (multiplayerStarted)
         {
+            Player player1 = players.get(0);
+            Player player2 = players.get(1);
             if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT)
             {
                 // Stop player moving
-                players.get(0).setDirection("stop");
+                player1.setDirection("stop");
             }
 
             if (keyCode == KeyEvent.VK_A || keyCode == KeyEvent.VK_D)
             {
                 // Stop player moving
-                players.get(1).setDirection("stop");
+                player2.setDirection("stop");
             }
         }
     }
@@ -1052,7 +1226,7 @@ public class PlatformPanic extends GameEngine
     {
         if (singlePlayerStarted) {
         // Set Gravity
-        double gravity = 1;
+        double gravity = 0.5;
 
         // Get Previous Position
         player.setPrevPosY(player.getPosY());
@@ -1065,7 +1239,7 @@ public class PlatformPanic extends GameEngine
         }
         if (multiplayerStarted && players != null && players.size() >= 2) {
             // Set Gravity for Player 1
-            double gravity = 1;
+            double gravity = 0.5;
             Player player1 = players.get(0);
             player1.setPrevPosY(player1.getPosY());
             player1.setFallSpeed(player1.getFallSpeed() + gravity);
@@ -1122,7 +1296,6 @@ public class PlatformPanic extends GameEngine
             {
                 // Game Over
                 System.out.println("Gameover");
-                singlePlayerStarted = false;
                 gameOver = true;
 
                 // Save Highscore if the highscore is greater than the score
@@ -1146,8 +1319,12 @@ public class PlatformPanic extends GameEngine
                 }
             }
             if (anyPlayerOut) {
-                multiplayerStarted = false;
-                gameOver = true;
+                if(winP1 == 5 || winP2 == 5){
+                    victory = true;
+                    gamePaused= true;
+                }
+                resetGame();
+                startMultiplayer();
             }
         }
     }
@@ -1156,37 +1333,36 @@ public class PlatformPanic extends GameEngine
     public void checkbounds()
     {
         if (singlePlayerStarted) {
-        if (player.getPosX() < 0)
+        if (player.getPosX() < -15)
         {
-            player.setPosX(0);
+            player.setPosX(-15);
         }
-
-        else if (player.getPosX() > mWidth - 5)
+        if (player.getPosX() > 763)
         {
-            player.setPosX(mWidth - 5);
+            player.setPosX(763);
         }
     }
         if (multiplayerStarted && players != null && players.size() >= 2) {
             // Check Player 1 Bounds
             Player player1 = players.get(0);
-            if (player1.getPosX() < 0) 
+            if (player1.getPosX() < 15)
             {
-                player1.setPosX(0);
+                player1.setPosX(15);
             } 
-            else if (player1.getPosX() > mWidth - 5) 
+            else if (player1.getPosX() > 763)
             {
-                player1.setPosX(mWidth - 5);
+                player1.setPosX(763);
             }
 
             // Check Player 2 Bounds
             Player player2 = players.get(1);
-            if (player2.getPosX() < 0) 
+            if (player2.getPosX() < 15)
             {
-                player2.setPosX(0);
+                player2.setPosX(15);
             } 
-            else if (player2.getPosX() > mWidth - 5) 
+            else if (player2.getPosX() > 763)
             {
-                player2.setPosX(mWidth - 5);
+                player2.setPosX(763);
             }
         }
     }
@@ -1194,6 +1370,7 @@ public class PlatformPanic extends GameEngine
     //Rest platforms
     public void resetGame()
     {
+        System.out.println("Reset Game");
         // Reset Score to 0
         score = 0;
 
@@ -1202,6 +1379,24 @@ public class PlatformPanic extends GameEngine
 
         // Set gameover to false
         gameOver = false;
+        if(singlePlayerStarted){
+            player.setPosX(startPlatform.posX);
+            player.setPosY(startPlatform.posY - 50);
+        }
+
+        if(multiplayerStarted) {
+            Player player1 = players.get(0);
+            player1.setPosX(startPlatform1.posX);
+            player1.setPosY(startPlatform1.posY);
+            Player player2 = players.get(1);
+            player2.setPosX(startPlatform2.posX);
+            player2.setPosY(startPlatform2.posY);
+            if(resetscores) {
+                winP2 = 0;
+                winP1 = 0;
+                resetscores = false;
+            }
+        }
 
         // Set Player to be on Start
         playerOnStart = true;
@@ -1211,4 +1406,5 @@ public class PlatformPanic extends GameEngine
         // Clear the players
         players.clear();
     }
+
 }

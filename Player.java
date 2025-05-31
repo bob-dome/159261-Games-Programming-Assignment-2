@@ -134,14 +134,14 @@ public class Player
         {
             // Set jumping to false as character is jumping
             jump = false;
-            fallSpeed = -15;
+            fallSpeed = -10;
             on = false;
 
             // Debug
             System.out.println("Player Jump");
         } else if (doubleJump && !on) {
             doubleJump = false;
-            fallSpeed = -15;
+            fallSpeed = -10;
 
           // Debug
             System.out.println("Player Double Jump");
