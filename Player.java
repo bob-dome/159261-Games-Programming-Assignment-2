@@ -27,6 +27,10 @@ public class Player
     // Direction of the player
     String direction;
 
+    String lastDirection = "left";
+
+
+
     // Constructor
     public Player(double posX, double posY, int width, int height, int acceleration, double speed, double fallSpeed, boolean valid) {
         this.posX = posX;
@@ -101,6 +105,9 @@ public class Player
         return direction;
     }
 
+    public String getLastDirection() {
+        return lastDirection;
+    }
 
     //Setters
     public void setPosX(double posX) {
@@ -161,4 +168,6 @@ public class Player
     {
         this.direction = direction;
     }
+
+    public void setLastDirection(String lastDirection) { this.lastDirection = lastDirection; }
 }
