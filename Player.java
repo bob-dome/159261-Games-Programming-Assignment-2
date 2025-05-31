@@ -1,12 +1,12 @@
-public class Player 
-{
+public class Player {
     // Variables for Player
     double posX;
     double posY;
     int width;
     int height;
-    //Gravity/Acceleration factor/jump height between sprite models/individual players?
-    //Maybe character select feature?
+    // Gravity/Acceleration factor/jump height between sprite models/individual
+    // players?
+    // Maybe character select feature?
     int acceleration;
     double speed;
     double fallSpeed;
@@ -17,7 +17,7 @@ public class Player
 
     // Can the player jump
     boolean jump = true;
-    
+
     // Can the player double jump
     boolean doubleJump = true;
 
@@ -29,10 +29,9 @@ public class Player
 
     String lastDirection = "left";
 
-
-
     // Constructor
-    public Player(double posX, double posY, int width, int height, int acceleration, double speed, double fallSpeed, boolean valid) {
+    public Player(double posX, double posY, int width, int height, int acceleration, double speed, double fallSpeed,
+            boolean valid) {
         this.posX = posX;
         this.posY = posY;
         this.width = width;
@@ -52,13 +51,11 @@ public class Player
         return posY;
     }
 
-    public int getWidth()
-    {
+    public int getWidth() {
         return width;
     }
 
-    public int getHeight()
-    {
+    public int getHeight() {
         return height;
     }
 
@@ -78,30 +75,24 @@ public class Player
         return valid;
     }
 
-    public boolean getPlatformStatus()
-    {
+    public boolean getPlatformStatus() {
         return on;
     }
 
-    public boolean jumping()
-    {
+    public boolean jumping() {
         return jump;
     }
 
-
-    public boolean doubleJumping()
-    {
+    public boolean doubleJumping() {
         return doubleJump;
     }
-    
-    public double getPrevPosY()
-    {
+
+    public double getPrevPosY() {
         return prevPosY;
     }
-    
+
     // Get Player's Direction
-    public String getDirection()
-    {
+    public String getDirection() {
         return direction;
     }
 
@@ -109,7 +100,7 @@ public class Player
         return lastDirection;
     }
 
-    //Setters
+    // Setters
     public void setPosX(double posX) {
         this.posX = posX;
     }
@@ -122,16 +113,12 @@ public class Player
         this.fallSpeed = fallSpeed;
     }
 
-    public void onPlatform(boolean on)
-    {
+    public void onPlatform(boolean on) {
         this.on = on;
     }
 
-
-    public void jump() 
-    {
-        if (jump && on)
-        {
+    public void jump() {
+        if (jump) {
             // Set jumping to false as character is jumping
             jump = false;
             fallSpeed = -10;
@@ -139,35 +126,33 @@ public class Player
 
             // Debug
             System.out.println("Player Jump");
-        } else if (doubleJump && !on) {
+        } else if (doubleJump) {
             doubleJump = false;
             fallSpeed = -10;
 
-          // Debug
+            // Debug
             System.out.println("Player Double Jump");
         }
     }
-   
-    public void canJump(boolean jump)
-    {
+
+    public void canJump(boolean jump) {
         this.jump = jump;
     }
 
-    public void canDoubleJump(boolean doubleJump)
-    {
+    public void canDoubleJump(boolean doubleJump) {
         this.doubleJump = doubleJump;
     }
 
-    public void setPrevPosY(double prevPosY)
-    {
+    public void setPrevPosY(double prevPosY) {
         this.prevPosY = prevPosY;
     }
 
     // Set Direction of the player
-    public void setDirection(String direction)
-    {
+    public void setDirection(String direction) {
         this.direction = direction;
     }
 
-    public void setLastDirection(String lastDirection) { this.lastDirection = lastDirection; }
+    public void setLastDirection(String lastDirection) {
+        this.lastDirection = lastDirection;
+    }
 }
