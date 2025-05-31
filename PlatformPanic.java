@@ -65,9 +65,13 @@ public class PlatformPanic extends GameEngine
     Image ToucanWalk;
     Image ToucanWalkFlipped;
     Image Parrot;
+    Image ParrotFlipped;
     Image ParrotJump;
     Image ParrotWalk;
-    Image sprite;
+    Image ParrotWalkFlipped;
+
+    //To find users last direction
+    String lastDirection;
 
 
     // Audio
@@ -119,6 +123,11 @@ public class PlatformPanic extends GameEngine
         Background = loadImage("resources/background.png");
         ToucanFlipped = loadImage("resources/toucan_flipped.png");
         ToucanWalkFlipped = loadImage("resources/toucan_walk_flipped.png");
+        ParrotFlipped = loadImage("resources/parrot_flipped.png");
+        ParrotWalkFlipped = loadImage("resources/parrot_flipped.png");
+
+        //String to find the users last direction
+        lastDirection = "left";
 
         // Debug
         System.out.println("Platform Panic Initialized");
@@ -172,17 +181,25 @@ public class PlatformPanic extends GameEngine
             clearBackground(mWidth, mHeight);
             drawImage(Background, 0, 0, mWidth, mHeight);
 
-            //Walking animations
+            //Player animations (jumping, left, right, idle)
             if (!player.jump){
                 drawImage(ToucanJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
             }
-            else if (direction == "left") {
+            else if (direction.equals("left")) {
+                lastDirection = "left";
                 drawImage(ToucanWalk, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
-            } else if (direction == "right"){
+            } else if (direction.equals("right")){
+                lastDirection = "right";
                 drawImage(ToucanWalkFlipped, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
             }
             else{
-                drawImage(Toucan, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                //If the player last moved a certain direction, the idle player will be facing that direction.
+                if (lastDirection.equals("left")){
+                    drawImage(Toucan, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                }
+                else{
+                    drawImage(ToucanFlipped, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                }
             }
 
             //Start Platform/s spawn
@@ -228,8 +245,30 @@ public class PlatformPanic extends GameEngine
             // Draw Players
             for (Player player : players)
             {
-                drawImage(Toucan, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                //Player animations (jumping, left, right, idle)
+                if (!player.jump){
+                    drawImage(ParrotJump, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                }
+                else if (player.direction.equals("left")) {
+                    player.setLastDirection("left");
+                    drawImage(ParrotWalk, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                } else if (player.direction.equals("right")){
+                    player.setLastDirection("right");
+                    drawImage(ParrotWalkFlipped, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                }
+                else{
+                    //If the player last moved a certain direction, the idle player will be facing that direction.
+                    if (player.getLastDirection().equals("left")){
+                        drawImage(Parrot, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                    }
+                    else if (player.getLastDirection().equals("right")){
+                        drawImage(ParrotFlipped, player.getPosX(), player.getPosY(), player.getWidth(), player.getHeight());
+                    }
+                }
+
+
             }
+
 
             // Falling platforms
             for (Platform platform : platforms) 
