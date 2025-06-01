@@ -834,7 +834,7 @@ public class PlatformPanic extends GameEngine {
         // Create a new random for randomizing speed and column of the platforms | Same
         // as createPlatforms except whilst the code is running
         Random random = new Random();
-        int added = 0;
+        int added = 15;
         boolean[] occupied = new boolean[gridColumns];
 
         // Check if there are platforms that are too close to the top and make it so
@@ -854,35 +854,37 @@ public class PlatformPanic extends GameEngine {
         }
 
         // Create an Array List to find all the current free columns
-        ArrayList<Integer> freeColumns = new ArrayList<>();
+        if (platforms.size() < added) {
+            ArrayList<Integer> freeColumns = new ArrayList<>();
 
-        // For loop to get all free columns into the ArrayList
-        for (int column = 0; column < gridColumns; column++) {
-            // If the column is not occupied
-            if (!occupied[column]) {
-                // Add the column to the ArrayList
-                freeColumns.add(column);
+            // For loop to get all free columns into the ArrayList
+            for (int column = 0; column < gridColumns; column++) {
+                // If the column is not occupied
+                if (!occupied[column]) {
+                    // Add the column to the ArrayList
+                    freeColumns.add(column);
+                }
             }
-        }
 
-        // Randomize the free columns and spawn a set amount in this new batch
-        Collections.shuffle(freeColumns);
-        int platformsToSpawn = Math.min(5, freeColumns.size());
+            // Randomize the free columns and spawn a set amount in this new batch
+            Collections.shuffle(freeColumns);
+            int platformsToSpawn = Math.min(5, freeColumns.size());
 
-        // For loop to randomly spawn the set amount of platforms
-        for (int i = 0; i < platformsToSpawn; i++) {
-            // Randomize the column and check that it's not occupuied
-            int column = freeColumns.get(i);
+            // For loop to randomly spawn the set amount of platforms
+            for (int i = 0; i < platformsToSpawn; i++) {
+                // Randomize the column and check that it's not occupuied
+                int column = freeColumns.get(i);
 
-            // Variables used for creating the platforms
-            double posX = column * gridWidth;
-            double posY = 0;
-            double length = gridWidth - 40;
-            double width = 5;
-            double fallSpeed = 25 + random.nextDouble() * 15;
+                // Variables used for creating the platforms
+                double posX = column * gridWidth;
+                double posY = 0;
+                double length = gridWidth - 40;
+                double width = 5;
+                double fallSpeed = 25 + random.nextDouble() * 15;
 
-            // Add the platform to the list
-            platforms.add(new Platform(posX, posY, length, width, fallSpeed));
+                // Add the platform to the list
+                platforms.add(new Platform(posX, posY, length, width, fallSpeed));
+            }
         }
     }
 
